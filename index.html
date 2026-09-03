@@ -4,29 +4,31 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Personal Workout Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px 20px; min-height: 100vh; }
     
-    .card { background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 440px; min-height: 660px; border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; position: relative; }
+    .card { background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 440px; border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; position: relative; }
     
     h1 { font-size: 22px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; text-align: center; }
     
     /* Streak Display */
     .streak-box { text-align: center; font-size: 15px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(56, 189, 248, 0.2); }
-    
+    .streak-warning { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
     /* Level Selector */
     .level-label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
-    .mode-selection { display: flex; gap: 8px; margin-bottom: 20px; }
+    .mode-selection { display: flex; gap: 8px; margin-bottom: 16px; }
     .mode-btn { flex: 1; padding: 10px 4px; border: 1px solid #334155; background: #0f172a; color: #94a3b8; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
     .mode-btn.active { background: #2563eb; color: #ffffff; border-color: #3b82f6; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4); }
     
     /* Spinner Display Box */
-    .spinner-display { height: 120px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; text-align: center; padding: 15px; }
+    .spinner-display { height: 120px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155; text-align: center; padding: 15px; }
     .spin-text { font-size: 18px; font-weight: 600; color: #64748b; }
     
     /* Result Content */
-    .result-box { display: none; text-align: left; flex-grow: 1; }
+    .result-box { display: none; text-align: left; margin-bottom: 20px; }
     .exercise-title { font-size: 24px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
     .reps-text { font-size: 16px; font-weight: 600; color: #38bdf8; margin-bottom: 14px; }
     .tutorial-text { font-size: 13px; color: #cbd5e1; line-height: 1.5; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; }
@@ -34,13 +36,19 @@
     /* Action Buttons */
     .btn { background: #2563eb; color: #ffffff; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
     .btn:hover { background: #1d4ed8; }
+    
     .btn-rest { background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; margin-top: 8px; box-shadow: none; }
     .btn-rest:hover { background: rgba(56, 189, 248, 0.1); }
     
-    /* Timer Display */
-    .timer-display { font-size: 32px; font-weight: 700; color: #38bdf8; margin-top: 12px; text-align: center; display: none; transition: color 0.3s ease; }
+    /* Timer Display & Controls */
+    .timer-container { display: none; margin-top: 12px; text-align: center; }
+    .timer-display { font-size: 32px; font-weight: 700; color: #38bdf8; transition: color 0.3s ease; }
     .timer-display.time-up { color: #ef4444; font-size: 28px; }
     
+    .timer-controls { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-timer-opt { flex: 1; background: #0f172a; color: #94a3b8; border: 1px solid #334155; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-timer-opt:hover { background: #334155; color: #ffffff; }
+
     /* Completion Check Box */
     .confirm-box { display: none; margin-top: 15px; text-align: center; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; }
     .confirm-title { font-size: 14px; font-weight: 600; color: #f8fafc; margin-bottom: 12px; }
@@ -54,6 +62,10 @@
     .feedback-msg { display: none; text-align: center; font-size: 14px; font-weight: 600; margin-top: 12px; padding: 10px; border-radius: 6px; }
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
     .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
+
+    /* Manual Dropdown Selector (Moved Down) */
+    .manual-picker-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed #334155; }
+    .select-dropdown { width: 100%; padding: 12px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -62,14 +74,14 @@
     <h1>Workout Generator</h1>
     
     <!-- Streak Display -->
-    <div class="streak-box" id="streakDisplay">🔥 Streak: 0 completed</div>
+    <div class="streak-box" id="streakDisplay">🔥 Daily Streak: 0 Days</div>
 
     <!-- Level Selector -->
     <div class="level-label">Select Intensity Level</div>
     <div class="mode-selection">
-      <button class="mode-btn active" onclick="setMode('beginner', this)">Beginner</button>
-      <button class="mode-btn" onclick="setMode('intermediate', this)">Intermediate</button>
-      <button class="mode-btn" onclick="setMode('pro', this)">Pro</button>
+      <button class="mode-btn active" id="btn-beginner" onclick="setMode('beginner', this)">Beginner</button>
+      <button class="mode-btn" id="btn-intermediate" onclick="setMode('intermediate', this)">Intermediate</button>
+      <button class="mode-btn" id="btn-pro" onclick="setMode('pro', this)">Pro</button>
     </div>
 
     <!-- Spinner Box -->
@@ -77,19 +89,27 @@
       <div class="spin-text" id="displayText">Pick a level & press Spin</div>
     </div>
 
-    <button class="btn" id="spinBtn" onclick="spinExercise()">Spin Exercise</button>
+    <button class="btn" id="spinBtn" onclick="spinExercise()">🎲 Spin Random Exercise</button>
 
     <!-- Results & Instructions -->
     <div class="result-box" id="resultBox">
       <div class="tutorial-text" id="exTut"></div>
       <button class="btn btn-rest" id="restBtn" onclick="startRest()">Start Rest</button>
-      <div class="timer-display" id="timer">0</div>
+
+      <!-- Timer Section -->
+      <div class="timer-container" id="timerContainer">
+        <div class="timer-display" id="timer">0</div>
+        <div class="timer-controls" id="timerControls">
+          <button class="btn-timer-opt" onclick="addRestTime(10)">+10s</button>
+          <button class="btn-timer-opt" onclick="skipRest()">Skip Rest</button>
+        </div>
+      </div>
       
       <!-- Completion Prompt -->
       <div class="confirm-box" id="confirmBox">
         <div class="confirm-title">Did you complete the set?</div>
         <div class="confirm-buttons">
-          <button class="btn-yes" onclick="handleCompletion(true)">Yes (+1 Streak)</button>
+          <button class="btn-yes" onclick="handleCompletion(true)">Yes</button>
           <button class="btn-no" onclick="handleCompletion(false)">No</button>
         </div>
       </div>
@@ -97,12 +117,22 @@
       <!-- Feedback Alert -->
       <div class="feedback-msg" id="feedbackMsg"></div>
     </div>
+
+    <!-- Manual Exercise Picker Section (Positioned at the Bottom) -->
+    <div class="manual-picker-section">
+      <div class="level-label">Or Pick Manually</div>
+      <select class="select-dropdown" id="exerciseSelect" onchange="selectManualExercise()">
+        <option value="">-- Choose an Exercise --</option>
+      </select>
+    </div>
   </div>
 
   <script>
     let currentMode = 'beginner';
     let timerInterval = null;
+    let secondsLeft = 0;
     let streakCount = parseInt(localStorage.getItem('workoutStreak') || '0');
+    let lastWorkoutDateStr = localStorage.getItem('lastWorkoutDateStr');
     let currentRestTime = 30;
 
     const exercises = [
@@ -156,29 +186,115 @@
       }
     ];
 
-    document.addEventListener('DOMContentLoaded', updateStreakDisplay);
+    document.addEventListener('DOMContentLoaded', () => {
+      populateDropdown();
+      checkStreakExpiry();
+      updateStreakDisplay();
+    });
+
+    function populateDropdown() {
+      const select = document.getElementById('exerciseSelect');
+      select.innerHTML = '<option value="">-- Choose an Exercise --</option>';
+      exercises.forEach((ex, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.innerText = ex.name;
+        select.appendChild(option);
+      });
+    }
+
+    function getTodayString() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function checkStreakExpiry() {
+      if (!lastWorkoutDateStr) return;
+
+      const today = new Date(getTodayString());
+      const lastDate = new Date(lastWorkoutDateStr);
+
+      const diffTime = today - lastDate;
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1) {
+        streakCount = 0;
+        localStorage.setItem('workoutStreak', '0');
+        const streakBox = document.getElementById('streakDisplay');
+        streakBox.classList.add('streak-warning');
+        streakBox.innerText = `⚠️ Streak Lost! You missed a day.`;
+      }
+    }
 
     function updateStreakDisplay() {
-      document.getElementById('streakDisplay').innerText = `🔥 Streak: ${streakCount} completed`;
+      const streakBox = document.getElementById('streakDisplay');
+      if (!streakBox.classList.contains('streak-warning')) {
+        streakBox.innerText = `🔥 Daily Streak: ${streakCount} Day${streakCount === 1 ? '' : 's'}`;
+      }
     }
 
     function setMode(mode, element) {
       currentMode = mode;
       document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
       element.classList.add('active');
+
+      const select = document.getElementById('exerciseSelect');
+      if (select.value !== "") {
+        selectManualExercise();
+      }
     }
 
-    function spinExercise() {
+    function selectManualExercise() {
+      const select = document.getElementById('exerciseSelect');
+      if (select.value === "") return;
+
+      const finalEx = exercises[select.value];
+      displayExerciseInfo(finalEx);
+    }
+
+    function displayExerciseInfo(finalEx) {
       const display = document.getElementById('spinDisplay');
       const resultBox = document.getElementById('resultBox');
-      const spinBtn = document.getElementById('spinBtn');
       const restBtn = document.getElementById('restBtn');
+      const timerContainer = document.getElementById('timerContainer');
       const timerDisplay = document.getElementById('timer');
       const confirmBox = document.getElementById('confirmBox');
       const feedbackMsg = document.getElementById('feedbackMsg');
 
       clearInterval(timerInterval);
-      timerDisplay.style.display = 'none';
+      timerContainer.style.display = 'none';
+      timerDisplay.classList.remove('time-up');
+      confirmBox.style.display = 'none';
+      feedbackMsg.style.display = 'none';
+
+      const reps = finalEx[currentMode];
+      currentRestTime = finalEx.rest[currentMode];
+
+      display.innerHTML = `
+        <div>
+          <div class="exercise-title">${finalEx.name}</div>
+          <div class="reps-text">${reps} (${currentMode.toUpperCase()})</div>
+        </div>
+      `;
+      
+      document.getElementById('exTut').innerHTML = `<strong>Form Guide:</strong> ${finalEx.tut}`;
+      restBtn.innerText = `Start ${currentRestTime}s Rest`;
+      restBtn.style.display = 'block';
+      resultBox.style.display = 'block';
+    }
+
+    function spinExercise() {
+      document.getElementById('exerciseSelect').value = "";
+      const display = document.getElementById('spinDisplay');
+      const resultBox = document.getElementById('resultBox');
+      const spinBtn = document.getElementById('spinBtn');
+      const timerContainer = document.getElementById('timerContainer');
+      const timerDisplay = document.getElementById('timer');
+      const confirmBox = document.getElementById('confirmBox');
+      const feedbackMsg = document.getElementById('feedbackMsg');
+
+      clearInterval(timerInterval);
+      timerContainer.style.display = 'none';
       timerDisplay.classList.remove('time-up');
       confirmBox.style.display = 'none';
       feedbackMsg.style.display = 'none';
@@ -194,21 +310,7 @@
         if (counter > 12) {
           clearInterval(shuffleInterval);
           const finalEx = exercises[Math.floor(Math.random() * exercises.length)];
-          const reps = finalEx[currentMode];
-          
-          currentRestTime = finalEx.rest[currentMode];
-
-          display.innerHTML = `
-            <div>
-              <div class="exercise-title">${finalEx.name}</div>
-              <div class="reps-text">${reps} (${currentMode.toUpperCase()})</div>
-            </div>
-          `;
-          
-          document.getElementById('exTut').innerHTML = `<strong>Form Guide:</strong> ${finalEx.tut}`;
-          restBtn.innerText = `Start ${currentRestTime}s Rest`;
-          restBtn.style.display = 'block';
-          resultBox.style.display = 'block';
+          displayExerciseInfo(finalEx);
           spinBtn.disabled = false;
         }
       }, 100);
@@ -216,14 +318,24 @@
 
     function startRest() {
       const restBtn = document.getElementById('restBtn');
+      const timerContainer = document.getElementById('timerContainer');
       const timerDisplay = document.getElementById('timer');
+      const timerControls = document.getElementById('timerControls');
       
       restBtn.style.display = 'none';
-      timerDisplay.style.display = 'block';
+      timerContainer.style.display = 'block';
+      timerControls.style.display = 'flex';
       timerDisplay.classList.remove('time-up');
       
-      let secondsLeft = currentRestTime;
+      secondsLeft = currentRestTime;
       timerDisplay.innerText = secondsLeft;
+
+      runTimer();
+    }
+
+    function runTimer() {
+      const timerDisplay = document.getElementById('timer');
+      const timerControls = document.getElementById('timerControls');
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
@@ -232,38 +344,69 @@
 
         if (secondsLeft <= 0) {
           clearInterval(timerInterval);
-          // Highlight in RED when time is up
           timerDisplay.innerText = "TIME IS UP!";
           timerDisplay.classList.add('time-up');
+          timerControls.style.display = 'none';
           
           document.getElementById('confirmBox').style.display = 'block';
         }
       }, 1000);
     }
 
+    function addRestTime(seconds) {
+      secondsLeft += seconds;
+      document.getElementById('timer').innerText = secondsLeft;
+    }
+
+    function skipRest() {
+      clearInterval(timerInterval);
+      const timerDisplay = document.getElementById('timer');
+      const timerControls = document.getElementById('timerControls');
+      
+      timerDisplay.innerText = "TIME IS UP!";
+      timerDisplay.classList.add('time-up');
+      timerControls.style.display = 'none';
+      
+      document.getElementById('confirmBox').style.display = 'block';
+    }
+
     function handleCompletion(didComplete) {
       const feedbackMsg = document.getElementById('feedbackMsg');
+      const streakBox = document.getElementById('streakDisplay');
+      
+      streakBox.classList.remove('streak-warning');
       document.getElementById('confirmBox').style.display = 'none';
       feedbackMsg.style.display = 'block';
 
       if (didComplete) {
-        streakCount++;
-        localStorage.setItem('workoutStreak', streakCount.toString());
-        updateStreakDisplay();
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
 
-        feedbackMsg.className = 'feedback-msg msg-success';
+        const todayStr = getTodayString();
 
-        // Check for Duolingo-style milestones
-        if (streakCount === 1) {
-          feedbackMsg.innerText = "🎉 Amazing work! 1st Streak complete!";
-        } else if (streakCount === 10) {
-          feedbackMsg.innerText = "🔥 UNSTOPPABLE! 10 STREAK MILESTONE!";
-        } else if (streakCount === 30) {
-          feedbackMsg.innerText = "⚡ LEGENDARY STATUS! 30 STREAKS!";
-        } else if (streakCount === 100) {
-          feedbackMsg.innerText = "🏆 GODLIKE PERFECTION! 100 STREAKS!";
+        if (lastWorkoutDateStr !== todayStr) {
+          streakCount++;
+          lastWorkoutDateStr = todayStr;
+
+          localStorage.setItem('workoutStreak', streakCount.toString());
+          localStorage.setItem('lastWorkoutDateStr', todayStr);
+          updateStreakDisplay();
+
+          feedbackMsg.className = 'feedback-msg msg-success';
+
+          if (streakCount === 1) {
+            feedbackMsg.innerText = "🎉 Amazing work! Day 1 streak started!";
+          } else if (streakCount === 10) {
+            feedbackMsg.innerText = "🔥 UNSTOPPABLE! 10 DAY STREAK MILESTONE!";
+          } else if (streakCount === 30) {
+            feedbackMsg.innerText = "⚡ LEGENDARY STATUS! 30 DAY STREAK!";
+          } else if (streakCount === 100) {
+            feedbackMsg.innerText = "🏆 GODLIKE PERFECTION! 100 DAY STREAK!";
+          } else {
+            feedbackMsg.innerText = "🎉 Streak extended! Great job today!";
+          }
         } else {
-          feedbackMsg.innerText = "🎉 Amazing work! Keep it going!";
+          feedbackMsg.className = 'feedback-msg msg-success';
+          feedbackMsg.innerText = "💪 Bonus set finished! Daily streak already active today.";
         }
       } else {
         feedbackMsg.className = 'feedback-msg msg-fail';
