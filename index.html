@@ -7,49 +7,53 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px 20px; min-height: 100vh; }
-    
+    body { background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; padding: 20px; min-height: 100vh; }
     .card { background: #1e293b; border: 1px solid #334155; width: 100%; max-width: 440px; border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; flex-direction: column; position: relative; }
-    
     h1 { font-size: 22px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; text-align: center; }
     
-    /* Streak Display */
+    /* Login Gate Styling */
+    .auth-gate { display: flex; flex-direction: column; }
+    .auth-title { font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 6px; text-align: center; }
+    .auth-sub { font-size: 13px; color: #94a3b8; margin-bottom: 20px; text-align: center; }
+    .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 14px; outline: none; }
+    .auth-input:focus { border-color: #3b82f6; }
+    .auth-buttons { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-auth { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-signup { background: #16a34a; color: white; }
+    .btn-signup:hover { background: #15803d; }
+    .btn-login { background: #2563eb; color: white; }
+    .btn-login:hover { background: #1d4ed8; }
+    .auth-status { margin-top: 14px; font-size: 13px; font-weight: 600; text-align: center; }
+
+    /* Main App Interface (Hidden by Default) */
+    .app-content { display: none; }
+    .user-bar { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #334155; }
+    .user-email-text { font-size: 12px; font-weight: 600; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+    .btn-logout { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .btn-logout:hover { background: #b91c1c; }
+
     .streak-box { text-align: center; font-size: 15px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(56, 189, 248, 0.2); }
     .streak-warning { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-    /* Level Selector */
     .level-label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
     .mode-selection { display: flex; gap: 8px; margin-bottom: 16px; }
     .mode-btn { flex: 1; padding: 10px 4px; border: 1px solid #334155; background: #0f172a; color: #94a3b8; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
     .mode-btn.active { background: #2563eb; color: #ffffff; border-color: #3b82f6; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4); }
-    
-    /* Spinner Display Box */
     .spinner-display { height: 120px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 12px; margin-bottom: 16px; border: 1px solid #334155; text-align: center; padding: 15px; }
     .spin-text { font-size: 18px; font-weight: 600; color: #64748b; }
-    
-    /* Result Content */
     .result-box { display: none; text-align: left; margin-bottom: 20px; }
     .exercise-title { font-size: 24px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
     .reps-text { font-size: 16px; font-weight: 600; color: #38bdf8; margin-bottom: 14px; }
     .tutorial-text { font-size: 13px; color: #cbd5e1; line-height: 1.5; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; }
-    
-    /* Action Buttons */
     .btn { background: #2563eb; color: #ffffff; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
     .btn:hover { background: #1d4ed8; }
-    
     .btn-rest { background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; margin-top: 8px; box-shadow: none; }
     .btn-rest:hover { background: rgba(56, 189, 248, 0.1); }
-    
-    /* Timer Display & Controls */
     .timer-container { display: none; margin-top: 12px; text-align: center; }
     .timer-display { font-size: 32px; font-weight: 700; color: #38bdf8; transition: color 0.3s ease; }
     .timer-display.time-up { color: #ef4444; font-size: 28px; }
-    
     .timer-controls { display: flex; gap: 8px; margin-top: 8px; }
     .btn-timer-opt { flex: 1; background: #0f172a; color: #94a3b8; border: 1px solid #334155; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .btn-timer-opt:hover { background: #334155; color: #ffffff; }
-
-    /* Completion Check Box */
     .confirm-box { display: none; margin-top: 15px; text-align: center; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; }
     .confirm-title { font-size: 14px; font-weight: 600; color: #f8fafc; margin-bottom: 12px; }
     .confirm-buttons { display: flex; gap: 8px; }
@@ -57,13 +61,9 @@
     .btn-yes:hover { background: #15803d; }
     .btn-no { background: #dc2626; color: white; border: none; flex: 1; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
     .btn-no:hover { background: #b91c1c; }
-
-    /* Message Alert Box */
     .feedback-msg { display: none; text-align: center; font-size: 14px; font-weight: 600; margin-top: 12px; padding: 10px; border-radius: 6px; }
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
     .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
-
-    /* Manual Dropdown Selector (Moved Down) */
     .manual-picker-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed #334155; }
     .select-dropdown { width: 100%; padding: 12px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
   </style>
@@ -71,60 +71,73 @@
 <body>
 
   <div class="card">
-    <h1>Workout Generator</h1>
     
-    <!-- Streak Display -->
-    <div class="streak-box" id="streakDisplay">🔥 Daily Streak: 0 Days</div>
-
-    <!-- Level Selector -->
-    <div class="level-label">Select Intensity Level</div>
-    <div class="mode-selection">
-      <button class="mode-btn active" id="btn-beginner" onclick="setMode('beginner', this)">Beginner</button>
-      <button class="mode-btn" id="btn-intermediate" onclick="setMode('intermediate', this)">Intermediate</button>
-      <button class="mode-btn" id="btn-pro" onclick="setMode('pro', this)">Pro</button>
-    </div>
-
-    <!-- Spinner Box -->
-    <div class="spinner-display" id="spinDisplay">
-      <div class="spin-text" id="displayText">Pick a level & press Spin</div>
-    </div>
-
-    <button class="btn" id="spinBtn" onclick="spinExercise()">🎲 Spin Random Exercise</button>
-
-    <!-- Results & Instructions -->
-    <div class="result-box" id="resultBox">
-      <div class="tutorial-text" id="exTut"></div>
-      <button class="btn btn-rest" id="restBtn" onclick="startRest()">Start Rest</button>
-
-      <!-- Timer Section -->
-      <div class="timer-container" id="timerContainer">
-        <div class="timer-display" id="timer">0</div>
-        <div class="timer-controls" id="timerControls">
-          <button class="btn-timer-opt" onclick="addRestTime(10)">+10s</button>
-          <button class="btn-timer-opt" onclick="skipRest()">Skip Rest</button>
-        </div>
+    <div id="authGate" class="auth-gate">
+      <div class="auth-title">Welcome Player</div>
+      <div class="auth-sub">Enter your email and password to start playing</div>
+      <input type="email" id="auth-email" class="auth-input" placeholder="Email (e.g. user@gmail.com)" required />
+      <input type="password" id="auth-password" class="auth-input" placeholder="Password (min 6 chars)" required />
+      <div class="auth-buttons">
+        <button class="btn-auth btn-signup" onclick="handleAuth('signup')">Sign Up</button>
+        <button class="btn-auth btn-login" onclick="handleAuth('login')">Log In</button>
       </div>
-      
-      <!-- Completion Prompt -->
-      <div class="confirm-box" id="confirmBox">
-        <div class="confirm-title">Did you complete the set?</div>
-        <div class="confirm-buttons">
-          <button class="btn-yes" onclick="handleCompletion(true)">Yes</button>
-          <button class="btn-no" onclick="handleCompletion(false)">No</button>
-        </div>
+      <p id="auth-message" class="auth-status"></p>
+    </div>
+
+    <div id="appContent" class="app-content">
+      <div class="user-bar">
+        <span id="userDisplay" class="user-email-text">👤 User</span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
       </div>
 
-      <!-- Feedback Alert -->
-      <div class="feedback-msg" id="feedbackMsg"></div>
+      <h1>Workout Generator</h1>
+
+      <div class="streak-box" id="streakDisplay">🔥 Daily Streak: 0 Days</div>
+
+      <div class="level-label">Select Intensity Level</div>
+      <div class="mode-selection">
+        <button class="mode-btn active" id="btn-beginner" onclick="setMode('beginner', this)">Beginner</button>
+        <button class="mode-btn" id="btn-intermediate" onclick="setMode('intermediate', this)">Intermediate</button>
+        <button class="mode-btn" id="btn-pro" onclick="setMode('pro', this)">Pro</button>
+      </div>
+
+      <div class="spinner-display" id="spinDisplay">
+        <div class="spin-text" id="displayText">Pick a level & press Spin</div>
+      </div>
+
+      <button class="btn" id="spinBtn" onclick="spinExercise()">🎲 Spin Random Exercise</button>
+
+      <div class="result-box" id="resultBox">
+        <div class="tutorial-text" id="exTut"></div>
+        <button class="btn btn-rest" id="restBtn" onclick="startRest()">Start Rest</button>
+
+        <div class="timer-container" id="timerContainer">
+          <div class="timer-display" id="timer">0</div>
+          <div class="timer-controls" id="timerControls">
+            <button class="btn-timer-opt" onclick="addRestTime(10)">+10s</button>
+            <button class="btn-timer-opt" onclick="skipRest()">Skip Rest</button>
+          </div>
+        </div>
+        
+        <div class="confirm-box" id="confirmBox">
+          <div class="confirm-title">Did you complete the set?</div>
+          <div class="confirm-buttons">
+            <button class="btn-yes" onclick="handleCompletion(true)">Yes</button>
+            <button class="btn-no" onclick="handleCompletion(false)">No</button>
+          </div>
+        </div>
+
+        <div class="feedback-msg" id="feedbackMsg"></div>
+      </div>
+
+      <div class="manual-picker-section">
+        <div class="level-label">Or Pick Manually</div>
+        <select class="select-dropdown" id="exerciseSelect" onchange="selectManualExercise()">
+          <option value="">-- Choose an Exercise --</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Manual Exercise Picker Section (Positioned at the Bottom) -->
-    <div class="manual-picker-section">
-      <div class="level-label">Or Pick Manually</div>
-      <select class="select-dropdown" id="exerciseSelect" onchange="selectManualExercise()">
-        <option value="">-- Choose an Exercise --</option>
-      </select>
-    </div>
   </div>
 
   <script>
@@ -136,61 +149,81 @@
     let currentRestTime = 30;
 
     const exercises = [
-      {
-        name: "Pull-Ups",
-        beginner: "3 Reps",
-        intermediate: "7 Reps",
-        pro: "12 Reps",
-        rest: { beginner: 45, intermediate: 60, pro: 90 },
-        tut: "Grip the bar palms facing away, pull your chest up to the bar, and lower down under full control."
-      },
-      {
-        name: "Push-Ups",
-        beginner: "5 Reps",
-        intermediate: "12 Reps",
-        pro: "25 Reps",
-        rest: { beginner: 25, intermediate: 40, pro: 60 },
-        tut: "Keep your hands shoulder-width apart, keep your back straight, and lower your chest near the floor."
-      },
-      {
-        name: "Plank",
-        beginner: "15 Seconds",
-        intermediate: "35 Seconds",
-        pro: "60 Seconds",
-        rest: { beginner: 20, intermediate: 30, pro: 45 },
-        tut: "Hold your body flat on your forearms and toes. Engage your core and keep your hips aligned."
-      },
-      {
-        name: "Bodyweight Squats",
-        beginner: "8 Reps",
-        intermediate: "18 Reps",
-        pro: "30 Reps",
-        rest: { beginner: 20, intermediate: 35, pro: 50 },
-        tut: "Keep feet shoulder-width apart, lower your hips as if sitting down, and push up through your heels."
-      },
-      {
-        name: "Lunges",
-        beginner: "4 Reps / leg",
-        intermediate: "10 Reps / leg",
-        pro: "16 Reps / leg",
-        rest: { beginner: 25, intermediate: 35, pro: 50 },
-        tut: "Step forward, drop your back knee close to the floor at 90 degrees, then push back to start."
-      },
-      {
-        name: "Mountain Climbers",
-        beginner: "10 Reps",
-        intermediate: "24 Reps",
-        pro: "40 Reps",
-        rest: { beginner: 20, intermediate: 30, pro: 45 },
-        tut: "In a high plank position, drive your knees toward your chest quickly in an alternating motion."
-      }
+      { name: "Pull-Ups", beginner: "3 Reps", intermediate: "7 Reps", pro: "12 Reps", rest: { beginner: 45, intermediate: 60, pro: 90 }, tut: "Grip the bar palms facing away, pull your chest up to the bar, and lower down under full control." },
+      { name: "Push-Ups", beginner: "5 Reps", intermediate: "12 Reps", pro: "25 Reps", rest: { beginner: 25, intermediate: 40, pro: 60 }, tut: "Keep your hands shoulder-width apart, keep your back straight, and lower your chest near the floor." },
+      { name: "Plank", beginner: "15 Seconds", intermediate: "35 Seconds", pro: "60 Seconds", rest: { beginner: 20, intermediate: 30, pro: 45 }, tut: "Hold your body flat on your forearms and toes. Engage your core and keep your hips aligned." },
+      { name: "Bodyweight Squats", beginner: "8 Reps", intermediate: "18 Reps", pro: "30 Reps", rest: { beginner: 20, intermediate: 35, pro: 50 }, tut: "Keep feet shoulder-width apart, lower your hips as if sitting down, and push up through your heels." },
+      { name: "Lunges", beginner: "4 Reps / leg", intermediate: "10 Reps / leg", pro: "16 Reps / leg", rest: { beginner: 25, intermediate: 35, pro: 50 }, tut: "Step forward, drop your back knee close to the floor at 90 degrees, then push back to start." },
+      { name: "Mountain Climbers", beginner: "10 Reps", intermediate: "24 Reps", pro: "40 Reps", rest: { beginner: 20, intermediate: 30, pro: 45 }, tut: "In a high plank position, drive your knees toward your chest quickly in an alternating motion." }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
       populateDropdown();
       checkStreakExpiry();
       updateStreakDisplay();
+      checkLoginSession();
     });
+
+    function handleAuth(type) {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      const message = document.getElementById('auth-message');
+
+      // Validates proper email structure (e.g., user@domain.com)
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email)) {
+        message.style.color = '#f87171';
+        message.innerText = 'Error: Enter a valid email (e.g. name@gmail.com)';
+        return;
+      }
+
+      if (password.length < 6) {
+        message.style.color = '#f87171';
+        message.innerText = 'Error: Password must be at least 6 characters.';
+        return;
+      }
+
+      if (type === 'signup') {
+        localStorage.setItem('workoutUser_' + email, password);
+        localStorage.setItem('loggedInUser', email);
+        unlockApp(email);
+      } else if (type === 'login') {
+        const storedPassword = localStorage.getItem('workoutUser_' + email);
+        if (storedPassword === password) {
+          localStorage.setItem('loggedInUser', email);
+          unlockApp(email);
+        } else if (!storedPassword) {
+          message.style.color = '#f87171';
+          message.innerText = 'Account does not exist. Please click Sign Up.';
+        } else {
+          message.style.color = '#f87171';
+          message.innerText = 'Incorrect password.';
+        }
+      }
+    }
+
+    function checkLoginSession() {
+      const activeUser = localStorage.getItem('loggedInUser');
+      if (activeUser) {
+        unlockApp(activeUser);
+      }
+    }
+
+    function unlockApp(email) {
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('userDisplay').innerText = `👤 ${email}`;
+    }
+
+    function logout() {
+      localStorage.removeItem('loggedInUser');
+      document.getElementById('appContent').style.display = 'none';
+      document.getElementById('authGate').style.display = 'flex';
+      document.getElementById('auth-email').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-message').innerText = '';
+    }
 
     function populateDropdown() {
       const select = document.getElementById('exerciseSelect');
@@ -210,10 +243,8 @@
 
     function checkStreakExpiry() {
       if (!lastWorkoutDateStr) return;
-
       const today = new Date(getTodayString());
       const lastDate = new Date(lastWorkoutDateStr);
-
       const diffTime = today - lastDate;
       const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
@@ -237,19 +268,14 @@
       currentMode = mode;
       document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
       element.classList.add('active');
-
       const select = document.getElementById('exerciseSelect');
-      if (select.value !== "") {
-        selectManualExercise();
-      }
+      if (select.value !== "") selectManualExercise();
     }
 
     function selectManualExercise() {
       const select = document.getElementById('exerciseSelect');
       if (select.value === "") return;
-
-      const finalEx = exercises[select.value];
-      displayExerciseInfo(finalEx);
+      displayExerciseInfo(exercises[select.value]);
     }
 
     function displayExerciseInfo(finalEx) {
@@ -270,13 +296,7 @@
       const reps = finalEx[currentMode];
       currentRestTime = finalEx.rest[currentMode];
 
-      display.innerHTML = `
-        <div>
-          <div class="exercise-title">${finalEx.name}</div>
-          <div class="reps-text">${reps} (${currentMode.toUpperCase()})</div>
-        </div>
-      `;
-      
+      display.innerHTML = `<div><div class="exercise-title">${finalEx.name}</div><div class="reps-text">${reps} (${currentMode.toUpperCase()})</div></div>`;
       document.getElementById('exTut').innerHTML = `<strong>Form Guide:</strong> ${finalEx.tut}`;
       restBtn.innerText = `Start ${currentRestTime}s Rest`;
       restBtn.style.display = 'block';
@@ -306,7 +326,6 @@
         const randomEx = exercises[Math.floor(Math.random() * exercises.length)];
         display.innerHTML = `<div class="spin-text">${randomEx.name}</div>`;
         counter++;
-
         if (counter > 12) {
           clearInterval(shuffleInterval);
           const finalEx = exercises[Math.floor(Math.random() * exercises.length)];
@@ -326,28 +345,23 @@
       timerContainer.style.display = 'block';
       timerControls.style.display = 'flex';
       timerDisplay.classList.remove('time-up');
-      
       secondsLeft = currentRestTime;
       timerDisplay.innerText = secondsLeft;
-
       runTimer();
     }
 
     function runTimer() {
       const timerDisplay = document.getElementById('timer');
       const timerControls = document.getElementById('timerControls');
-
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         secondsLeft--;
         timerDisplay.innerText = secondsLeft;
-
         if (secondsLeft <= 0) {
           clearInterval(timerInterval);
           timerDisplay.innerText = "TIME IS UP!";
           timerDisplay.classList.add('time-up');
           timerControls.style.display = 'none';
-          
           document.getElementById('confirmBox').style.display = 'block';
         }
       }, 1000);
@@ -362,67 +376,39 @@
       clearInterval(timerInterval);
       const timerDisplay = document.getElementById('timer');
       const timerControls = document.getElementById('timerControls');
-      
       timerDisplay.innerText = "TIME IS UP!";
       timerDisplay.classList.add('time-up');
       timerControls.style.display = 'none';
-      
       document.getElementById('confirmBox').style.display = 'block';
     }
 
     function handleCompletion(didComplete) {
       const feedbackMsg = document.getElementById('feedbackMsg');
       const streakBox = document.getElementById('streakDisplay');
-      
       streakBox.classList.remove('streak-warning');
       document.getElementById('confirmBox').style.display = 'none';
       feedbackMsg.style.display = 'block';
 
       if (didComplete) {
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-
         const todayStr = getTodayString();
-
         if (lastWorkoutDateStr !== todayStr) {
           streakCount++;
           lastWorkoutDateStr = todayStr;
-
           localStorage.setItem('workoutStreak', streakCount.toString());
           localStorage.setItem('lastWorkoutDateStr', todayStr);
           updateStreakDisplay();
-
           feedbackMsg.className = 'feedback-msg msg-success';
-
-          if (streakCount === 1) {
-            feedbackMsg.innerText = "🎉 Amazing work! Day 1 streak started!";
-          } else if (streakCount === 10) {
-            feedbackMsg.innerText = "🔥 UNSTOPPABLE! 10 DAY STREAK MILESTONE!";
-          } else if (streakCount === 30) {
-            feedbackMsg.innerText = "⚡ LEGENDARY STATUS! 30 DAY STREAK!";
-          } else if (streakCount === 100) {
-            feedbackMsg.innerText = "🏆 GODLIKE PERFECTION! 100 DAY STREAK!";
-          } else {
-            feedbackMsg.innerText = "🎉 Streak extended! Great job today!";
-          }
+          feedbackMsg.innerText = "🎉 Great job! Streak extended!";
         } else {
           feedbackMsg.className = 'feedback-msg msg-success';
-          feedbackMsg.innerText = "💪 Bonus set finished! Daily streak already active today.";
+          feedbackMsg.innerText = "💪 Bonus set finished!";
         }
       } else {
         feedbackMsg.className = 'feedback-msg msg-fail';
-        feedbackMsg.innerText = "No worries! Get 'em next round!";
+        feedbackMsg.innerText = "No worries! Try again next set.";
       }
     }
   </script>
 </body>
-</html><!-- LOGIN / SIGNUP BOX -->
-<div id="auth-container" style="max-width: 350px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; text-align: center; background-color: #fff;">
-  <h3 style="margin-top: 0;">Account Access</h3>
-  <input type="email" id="auth-email" placeholder="Enter your email" style="width: 90%; padding: 8px; margin-bottom: 8px;" required />
-  <br />
-  <input type="password" id="auth-password" placeholder="Enter password" style="width: 90%; padding: 8px; margin-bottom: 8px;" required />
-  <br />
-  <button id="btn-signup" style="padding: 8px 14px; margin-right: 5px; cursor: pointer;">Sign Up</button>
-  <button id="btn-login" style="padding: 8px 14px; cursor: pointer;">Log In</button>
-  <p id="auth-message" style="margin-top: 10px; font-weight: bold;"></p>
-</div>
+</html>
