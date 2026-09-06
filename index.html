@@ -39,10 +39,12 @@
     .result-box { display: none; text-align: left; margin-bottom: 20px; }
     .exercise-title { font-size: 24px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
     .reps-text { font-size: 16px; font-weight: 600; color: #38bdf8; margin-bottom: 14px; }
-    .tutorial-text { font-size: 13px; color: #cbd5e1; line-height: 1.5; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; }
+    .tutorial-text { font-size: 13px; color: #cbd5e1; line-height: 1.5; background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px; }
 
     .btn { background: #2563eb; color: #ffffff; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
     .btn:hover { background: #1d4ed8; }
+    .btn-easier { background: #334155; color: #f1f5f9; border: 1px solid #475569; padding: 10px; font-size: 13px; margin-bottom: 12px; box-shadow: none; }
+    .btn-easier:hover { background: #475569; }
     .btn-rest { background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; margin-top: 8px; box-shadow: none; }
     .btn-rest:hover { background: rgba(56, 189, 248, 0.1); }
     .timer-container { display: none; margin-top: 12px; text-align: center; }
@@ -60,7 +62,7 @@
     .btn-no:hover { background: #b91c1c; }
     .feedback-msg { display: none; text-align: center; font-size: 14px; font-weight: 600; margin-top: 12px; padding: 10px; border-radius: 6px; }
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
-    .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
+    .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(22, 163, 74, 0.3); }
     .manual-picker-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed #334155; }
     .select-dropdown { width: 100%; padding: 12px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
   </style>
@@ -108,6 +110,7 @@
 
       <div class="result-box" id="resultBox">
         <div class="tutorial-text" id="exTut"></div>
+        <button class="btn btn-easier" id="easierBtn" onclick="switchToEasier()">⚡ Can't do this? Try an easier version</button>
         <button class="btn btn-rest" id="restBtn" onclick="startRest()">Start Rest</button>
 
         <div class="timer-container" id="timerContainer">
@@ -146,6 +149,7 @@
     let streakCount = parseInt(localStorage.getItem('workoutStreak') || '0');
     let lastWorkoutDateStr = localStorage.getItem('lastWorkoutDateStr');
     let currentRestTime = 30;
+    let currentExerciseIndex = null;
 
     const exercises = [
       { 
@@ -155,7 +159,15 @@
         pro: "12 Reps", 
         rest: { beginner: 45, intermediate: 60, pro: 90 }, 
         tut: "Grip the bar palms facing away, pull your chest up to the bar, and lower down under full control.",
-        embed: "https://www.youtube-nocookie.com/embed/eGo4IYlbE5g"
+        embed: "https://www.youtube-nocookie.com/embed/eGo4IYlbE5g",
+        easier: {
+          name: "Dead Hang (Bar Hold)",
+          beginner: "15 Seconds",
+          intermediate: "30 Seconds",
+          pro: "45 Seconds",
+          tut: "Grip the pull-up bar firmly with arms fully extended. Keep your core tight, shoulders engaged, and hang without touching the ground.",
+          embed: "https://www.youtube-nocookie.com/embed/3E1bLwRClY4"
+        }
       },
       { 
         name: "Push-Ups", 
@@ -164,7 +176,15 @@
         pro: "25 Reps", 
         rest: { beginner: 25, intermediate: 40, pro: 60 }, 
         tut: "Keep your hands shoulder-width apart, keep your back straight, and lower your chest near the floor.",
-        embed: "https://www.youtube-nocookie.com/embed/IODxDxX7oi4"
+        embed: "https://www.youtube-nocookie.com/embed/IODxDxX7oi4",
+        easier: {
+          name: "Knee Push-Ups",
+          beginner: "6 Reps",
+          intermediate: "14 Reps",
+          pro: "25 Reps",
+          tut: "Rest your knees on the floor, cross your ankles behind you, keep your back straight, and lower your chest down.",
+          embed: "https://www.youtube-nocookie.com/embed/WcHtt6zT3Go"
+        }
       },
       { 
         name: "Plank", 
@@ -173,7 +193,15 @@
         pro: "60 Seconds", 
         rest: { beginner: 20, intermediate: 30, pro: 45 }, 
         tut: "Hold your body flat on your forearms and toes. Engage your core and keep your hips aligned.",
-        embed: "https://www.youtube-nocookie.com/embed/pSHjTRCQxIw"
+        embed: "https://www.youtube-nocookie.com/embed/pSHjTRCQxIw",
+        easier: {
+          name: "Knee Plank",
+          beginner: "15 Seconds",
+          intermediate: "30 Seconds",
+          pro: "45 Seconds",
+          tut: "Support your upper body on your forearms while resting your knees on the ground. Maintain a straight line from knees to head.",
+          embed: "https://www.youtube-nocookie.com/embed/6i3Ina8aRmg"
+        }
       },
       { 
         name: "Bodyweight Squats", 
@@ -182,7 +210,15 @@
         pro: "30 Reps", 
         rest: { beginner: 20, intermediate: 35, pro: 50 }, 
         tut: "Keep feet shoulder-width apart, lower your hips as if sitting down, and push up through your heels.",
-        embed: "https://www.youtube-nocookie.com/embed/aclHkVaku9U"
+        embed: "https://www.youtube-nocookie.com/embed/aclHkVaku9U",
+        easier: {
+          name: "Chair Squats / Assisted Squats",
+          beginner: "8 Reps",
+          intermediate: "15 Reps",
+          pro: "25 Reps",
+          tut: "Stand in front of a chair or bed. Slowly sit back until your thighs touch the seat, then press through your heels to stand back up.",
+          embed: "https://www.youtube-nocookie.com/embed/0G2_XV7slKg"
+        }
       },
       { 
         name: "Lunges", 
@@ -191,7 +227,15 @@
         pro: "16 Reps / leg", 
         rest: { beginner: 25, intermediate: 35, pro: 50 }, 
         tut: "Step forward, drop your back knee close to the floor at 90 degrees, then push back to start.",
-        embed: "https://www.youtube-nocookie.com/embed/QOVaHwm-Q6U"
+        embed: "https://www.youtube-nocookie.com/embed/QOVaHwm-Q6U",
+        easier: {
+          name: "Static Reverse Lunges",
+          beginner: "4 Reps / leg",
+          intermediate: "8 Reps / leg",
+          pro: "14 Reps / leg",
+          tut: "Step backward with one leg and lower your knee slightly. Step back up to standing without rushing for better balance.",
+          embed: "https://www.youtube-nocookie.com/embed/wrwwXE_x-pQ"
+        }
       },
       { 
         name: "Mountain Climbers", 
@@ -200,7 +244,15 @@
         pro: "40 Reps", 
         rest: { beginner: 20, intermediate: 30, pro: 45 }, 
         tut: "In a high plank position, drive your knees toward your chest quickly in an alternating motion.",
-        embed: "https://www.youtube-nocookie.com/embed/nmwgirgXLYM"
+        embed: "https://www.youtube-nocookie.com/embed/nmwgirgXLYM",
+        easier: {
+          name: "Slow High Knees",
+          beginner: "12 Reps",
+          intermediate: "20 Reps",
+          pro: "30 Reps",
+          tut: "Stand up straight and lift one knee up toward your chest at a steady, controlled pace, alternating legs.",
+          embed: "https://www.youtube-nocookie.com/embed/ZZZuL2vB64A"
+        }
       }
     ];
 
@@ -319,13 +371,15 @@
     function selectManualExercise() {
       const select = document.getElementById('exerciseSelect');
       if (select.value === "") return;
-      displayExerciseInfo(exercises[select.value]);
+      currentExerciseIndex = parseInt(select.value);
+      displayExerciseInfo(exercises[currentExerciseIndex]);
     }
 
-    function displayExerciseInfo(finalEx) {
+    function displayExerciseInfo(finalEx, isEasierVersion = false) {
       const display = document.getElementById('spinDisplay');
       const resultBox = document.getElementById('resultBox');
       const restBtn = document.getElementById('restBtn');
+      const easierBtn = document.getElementById('easierBtn');
       const timerContainer = document.getElementById('timerContainer');
       const timerDisplay = document.getElementById('timer');
       const confirmBox = document.getElementById('confirmBox');
@@ -337,21 +391,36 @@
       confirmBox.style.display = 'none';
       feedbackMsg.style.display = 'none';
 
-      const reps = finalEx[currentMode];
+      const reps = isEasierVersion ? finalEx.easier[currentMode] : finalEx[currentMode];
+      const exName = isEasierVersion ? finalEx.easier.name : finalEx.name;
+      const exTut = isEasierVersion ? finalEx.easier.tut : finalEx.tut;
+      const exEmbed = isEasierVersion ? finalEx.easier.embed : finalEx.embed;
+
       currentRestTime = finalEx.rest[currentMode];
 
-      display.innerHTML = `<div><div class="exercise-title">${finalEx.name}</div><div class="reps-text">${reps} (${currentMode.toUpperCase()})</div></div>`;
+      display.innerHTML = `<div><div class="exercise-title">${exName}</div><div class="reps-text">${reps} (${currentMode.toUpperCase()})</div></div>`;
       
       document.getElementById('exTut').innerHTML = `
-        <strong>Form Guide:</strong> ${finalEx.tut}
+        <strong>Form Guide:</strong> ${exTut}
         <div style="margin-top: 12px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid #334155;">
-          <iframe src="${finalEx.embed}" title="${finalEx.name} Tutorial" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe src="${exEmbed}" title="${exName} Tutorial" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       `;
       
+      if (isEasierVersion) {
+        easierBtn.style.display = 'none';
+      } else {
+        easierBtn.style.display = 'block';
+      }
+
       restBtn.innerText = `Start ${currentRestTime}s Rest`;
       restBtn.style.display = 'block';
       resultBox.style.display = 'block';
+    }
+
+    function switchToEasier() {
+      if (currentExerciseIndex === null) return;
+      displayExerciseInfo(exercises[currentExerciseIndex], true);
     }
 
     function spinExercise() {
@@ -379,8 +448,8 @@
         counter++;
         if (counter > 12) {
           clearInterval(shuffleInterval);
-          const finalEx = exercises[Math.floor(Math.random() * exercises.length)];
-          displayExerciseInfo(finalEx);
+          currentExerciseIndex = Math.floor(Math.random() * exercises.length);
+          displayExerciseInfo(exercises[currentExerciseIndex]);
           spinBtn.disabled = false;
         }
       }, 100);
@@ -388,11 +457,13 @@
 
     function startRest() {
       const restBtn = document.getElementById('restBtn');
+      const easierBtn = document.getElementById('easierBtn');
       const timerContainer = document.getElementById('timerContainer');
       const timerDisplay = document.getElementById('timer');
       const timerControls = document.getElementById('timerControls');
       
       restBtn.style.display = 'none';
+      easierBtn.style.display = 'none';
       timerContainer.style.display = 'block';
       timerControls.style.display = 'flex';
       timerDisplay.classList.remove('time-up');
