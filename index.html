@@ -62,9 +62,25 @@
     .btn-no:hover { background: #b91c1c; }
     .feedback-msg { display: none; text-align: center; font-size: 14px; font-weight: 600; margin-top: 12px; padding: 10px; border-radius: 6px; }
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
-    .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(22, 163, 74, 0.3); }
+    .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
     .manual-picker-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed #334155; }
     .select-dropdown { width: 100%; padding: 12px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
+
+    /* Workout History Styles */
+    .history-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed #334155; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .history-title { font-size: 14px; font-weight: 700; color: #f8fafc; }
+    .btn-clear-history { background: transparent; color: #64748b; border: none; font-size: 11px; cursor: pointer; font-weight: 600; }
+    .btn-clear-history:hover { color: #f87171; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+    .history-item { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .history-details { display: flex; flex-direction: column; gap: 2px; }
+    .history-name { font-weight: 600; color: #f8fafc; }
+    .history-reps { font-size: 12px; color: #94a3b8; }
+    .status-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+    .status-completed { background: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.4); }
+    .status-skipped { background: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.4); }
+    .empty-history { text-align: center; color: #64748b; font-size: 12px; padding: 12px; }
   </style>
 </head>
 <body>
@@ -138,6 +154,16 @@
           <option value="">-- Choose an Exercise --</option>
         </select>
       </div>
+
+      <div class="history-section">
+        <div class="history-header">
+          <span class="history-title">📊 Today's Workout History</span>
+          <button class="btn-clear-history" onclick="clearHistory()">Clear History</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="empty-history">No exercises logged today yet!</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -150,6 +176,8 @@
     let lastWorkoutDateStr = localStorage.getItem('lastWorkoutDateStr');
     let currentRestTime = 30;
     let currentExerciseIndex = null;
+    let isCurrentlyEasier = false;
+    let workoutHistory = JSON.parse(localStorage.getItem('todayWorkoutHistory') || '[]');
 
     const exercises = [
       { 
@@ -261,6 +289,7 @@
       checkStreakExpiry();
       updateStreakDisplay();
       checkLoginSession();
+      renderHistory();
     });
 
     async function handleFormSubmit(event) {
@@ -376,6 +405,7 @@
     }
 
     function displayExerciseInfo(finalEx, isEasierVersion = false) {
+      isCurrentlyEasier = isEasierVersion;
       const display = document.getElementById('spinDisplay');
       const resultBox = document.getElementById('resultBox');
       const restBtn = document.getElementById('restBtn');
@@ -511,6 +541,13 @@
       document.getElementById('confirmBox').style.display = 'none';
       feedbackMsg.style.display = 'block';
 
+      const currentEx = exercises[currentExerciseIndex];
+      const exName = isCurrentlyEasier ? currentEx.easier.name : currentEx.name;
+      const exReps = isCurrentlyEasier ? currentEx.easier[currentMode] : currentEx[currentMode];
+
+      // Add to workout history log
+      addHistoryEntry(exName, exReps, didComplete);
+
       if (didComplete) {
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
         const todayStr = getTodayString();
@@ -528,8 +565,46 @@
         }
       } else {
         feedbackMsg.className = 'feedback-msg msg-fail';
-        feedbackMsg.innerText = "No worries! Try again next set.";
+        feedbackMsg.innerText = "No worries! Logged as skipped.";
       }
+    }
+
+    function addHistoryEntry(name, reps, completed) {
+      const entry = {
+        name: name,
+        reps: reps,
+        completed: completed,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      workoutHistory.unshift(entry);
+      localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      if (workoutHistory.length === 0) {
+        historyList.innerHTML = '<div class="empty-history">No exercises logged today yet!</div>';
+        return;
+      }
+
+      historyList.innerHTML = workoutHistory.map(item => `
+        <div class="history-item">
+          <div class="history-details">
+            <span class="history-name">${item.name}</span>
+            <span class="history-reps">${item.reps} • ${item.time}</span>
+          </div>
+          <span class="status-badge ${item.completed ? 'status-completed' : 'status-skipped'}">
+            ${item.completed ? 'Done ✓' : 'Skipped ✗'}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    function clearHistory() {
+      workoutHistory = [];
+      localStorage.removeItem('todayWorkoutHistory');
+      renderHistory();
     }
   </script>
 </body>
