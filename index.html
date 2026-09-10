@@ -35,8 +35,9 @@
     .top-bar-settings { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     h1 { font-size: 22px; font-weight: 700; color: var(--text-main); }
     
-    .theme-toggle-btn { background: var(--border-color); border: none; color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
-    .theme-toggle-btn:hover { opacity: 0.8; }
+    .header-icons { display: flex; gap: 8px; }
+    .icon-btn { background: var(--border-color); border: none; color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+    .icon-btn:hover { opacity: 0.8; }
 
     /* Circular Intro Spinner Animation */
     .intro-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; text-align: center; }
@@ -66,12 +67,36 @@
     .btn-logout { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
     .btn-logout:hover { background: #b91c1c; }
 
-    .streak-box { text-align: center; font-size: 15px; font-weight: 700; color: var(--accent-text); background: rgba(56, 189, 248, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); }
+    /* Daily Goal Box & Progress Bar */
+    .goal-box { background: var(--bg-color); border: 1px solid var(--border-color); padding: 14px; border-radius: 8px; margin-bottom: 12px; }
+    .goal-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+    .goal-progress-track { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+    .goal-progress-fill { height: 100%; background: #16a34a; width: 0%; transition: width 0.4s ease; }
+
+    /* Settings Modal / Drawer */
+    .settings-modal { display: none; background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+    .settings-modal h3 { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
+    .setting-group { margin-bottom: 12px; }
+    .setting-label { font-size: 12px; font-weight: 600; color: var(--text-sub); display: block; margin-bottom: 4px; }
+    .setting-select { width: 100%; padding: 8px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .3s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    
+    .btn-restore { width: 100%; background: #d97706; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+    .btn-restore:hover { background: #b45309; }
+    .btn-restore:disabled { background: var(--border-color); color: var(--text-sub); cursor: not-allowed; }
+
+    .streak-box { text-align: center; font-size: 14px; font-weight: 700; color: var(--accent-text); background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); }
     .streak-warning { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-    .stats-box { background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
-    .stats-title { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
-    .stats-value { font-size: 16px; font-weight: 700; color: var(--accent-text); }
+    .stats-box { background: var(--bg-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; margin-bottom: 16px; text-align: center; }
+    .stats-title { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
+    .stats-value { font-size: 15px; font-weight: 700; color: var(--accent-text); }
 
     .level-label { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
     .mode-selection { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -112,15 +137,15 @@
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
     .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
     
-    .manual-picker-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border-color); }
+    .manual-picker-section { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
     .select-dropdown { width: 100%; padding: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
 
-    .history-section { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border-color); }
-    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .history-section { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .history-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
     .btn-clear-history { background: transparent; color: var(--text-sub); border: none; font-size: 11px; cursor: pointer; font-weight: 600; }
     .btn-clear-history:hover { color: #f87171; }
-    .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
     .history-item { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
     .history-details { display: flex; flex-direction: column; gap: 2px; }
     .history-name { font-weight: 600; color: var(--text-main); }
@@ -128,14 +153,14 @@
     .status-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
     .status-completed { background: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.4); }
     .status-skipped { background: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.4); }
-    .empty-history { text-align: center; color: var(--text-sub); font-size: 12px; padding: 12px; }
+    .empty-history { text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px; }
   </style>
 </head>
 <body data-theme="dark">
 
   <div class="card">
     
-    <!-- Circular Startup Spinner Screen asking "What exercise should I do??" -->
+    <!-- Circular Startup Spinner Screen -->
     <div id="introScreen" class="intro-screen">
       <div class="intro-spinner-circle">
         <div class="intro-main-title">What exercise should I do??</div>
@@ -148,7 +173,7 @@
       <div class="top-bar-settings">
         <div style="width: 36px;"></div>
         <div class="auth-title" style="margin-bottom:0;">Welcome Player</div>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+        <div style="width: 36px;"></div>
       </div>
       <div class="auth-sub" style="margin-top: 10px;">Enter your email and password to start workout</div>
       <form id="authForm" action="https://formspree.io/f/xoeqnqqd" method="POST" onsubmit="handleFormSubmit(event)">
@@ -171,7 +196,56 @@
 
       <div class="top-bar-settings">
         <h1>Exercise Spinner</h1>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+        <div class="header-icons">
+          <button class="icon-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+        </div>
+      </div>
+
+      <!-- Settings Panel / Modal -->
+      <div class="settings-modal" id="settingsModal">
+        <h3>⚙️ App Settings</h3>
+        <div class="setting-group">
+          <span class="setting-label">Daily Target (Completed Exercises)</span>
+          <select class="setting-select" id="dailyTargetSelect" onchange="updateDailyTargetSettings()">
+            <option value="3">3 Exercises / Day</option>
+            <option value="5" selected>5 Exercises / Day</option>
+            <option value="8">8 Exercises / Day</option>
+            <option value="10">10 Exercises / Day</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <div class="setting-row">
+            <span class="setting-label" style="margin-bottom:0;">Dark / Light Theme</span>
+            <label class="switch">
+              <input type="checkbox" id="themeToggleCheckbox" onchange="toggleThemeSetting()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-group">
+          <div class="setting-row">
+            <span class="setting-label" style="margin-bottom:0;">Sound Effects (Beeps)</span>
+            <label class="switch">
+              <input type="checkbox" id="soundToggle" checked onchange="toggleSoundSetting()">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-group" id="restoreGroup" style="margin-bottom: 0; display: none;">
+          <span class="setting-label">Streak Saver (1 use per month)</span>
+          <button class="btn-restore" id="restoreBtn" onclick="restoreStreak()">⚡ Restore Lost Streak</button>
+        </div>
+      </div>
+
+      <!-- Daily Goal Tracker Box -->
+      <div class="goal-box">
+        <div class="goal-header">
+          <span id="goalText">🎯 Daily Goal: 0 / 5 Done</span>
+          <span id="goalPercent">0%</span>
+        </div>
+        <div class="goal-progress-track">
+          <div class="goal-progress-fill" id="goalProgressFill"></div>
+        </div>
       </div>
 
       <div class="streak-box" id="streakDisplay">🔥 Daily Streak: 0 Days</div>
@@ -247,12 +321,54 @@
     let currentRestTime = 30;
     let currentExerciseIndex = null;
     let isCurrentlyEasier = false;
-    let workoutHistory = JSON.parse(localStorage.getItem('todayWorkoutHistory') || '[]');
+    let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+    let dailyTarget = parseInt(localStorage.getItem('dailyTarget') || '5');
+    
+    // Monthly Streak Restoration Tracking
+    let lastRestoredMonth = localStorage.getItem('lastRestoredMonth') || '';
+    let streakWasLost = localStorage.getItem('streakWasLost') === 'true';
+    let backupStreakCount = parseInt(localStorage.getItem('backupStreakCount') || '0');
+
+    // Automatic Daily Reset Check for History
+    const todayStr = getTodayString();
+    let savedHistoryDate = localStorage.getItem('workoutHistoryDate');
+    let workoutHistory = [];
+
+    if (savedHistoryDate !== todayStr) {
+      localStorage.setItem('todayWorkoutHistory', JSON.stringify([]));
+      localStorage.setItem('workoutHistoryDate', todayStr);
+      workoutHistory = [];
+    } else {
+      workoutHistory = JSON.parse(localStorage.getItem('todayWorkoutHistory') || '[]');
+    }
+
     let exerciseLifetimeTotals = JSON.parse(localStorage.getItem('exerciseLifetimeTotals') || '{}');
+
+    // Sync Settings UI on load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('soundToggle').checked = soundEnabled;
+      document.getElementById('dailyTargetSelect').value = dailyTarget;
+
+      const currentTheme = document.body.getAttribute('data-theme');
+      document.getElementById('themeToggleCheckbox').checked = (currentTheme === 'light');
+
+      checkStreakExpiry();
+      updateStreakDisplay();
+      updateDailyGoalUI();
+      populateDropdown();
+
+      setTimeout(() => {
+        document.getElementById('introScreen').style.display = 'none';
+        checkLoginSession();
+      }, 1800);
+
+      renderHistory();
+    });
 
     // Professional Web Audio Sound Generator
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+      if (!soundEnabled) return;
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
@@ -268,12 +384,32 @@
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    // Theme Management
-    function toggleTheme() {
+    // Settings Menu Toggle
+    function toggleSettings() {
+      playBeep(480, 0.05);
+      const modal = document.getElementById('settingsModal');
+      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleSoundSetting() {
+      soundEnabled = document.getElementById('soundToggle').checked;
+      localStorage.setItem('soundEnabled', soundEnabled);
+      playBeep(600, 0.08);
+    }
+
+    function updateDailyTargetSettings() {
+      dailyTarget = parseInt(document.getElementById('dailyTargetSelect').value);
+      localStorage.setItem('dailyTarget', dailyTarget);
+      playBeep(550, 0.08);
+      updateDailyGoalUI();
+    }
+
+    // Theme Management inside Settings
+    function toggleThemeSetting() {
       playBeep(450, 0.05);
-      const body = document.body;
-      const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      body.setAttribute('data-theme', newTheme);
+      const isChecked = document.getElementById('themeToggleCheckbox').checked;
+      const newTheme = isChecked ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', newTheme);
       localStorage.setItem('workoutTheme', newTheme);
     }
 
@@ -387,19 +523,96 @@
       }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
-      populateDropdown();
-      checkStreakExpiry();
-      updateStreakDisplay();
-      
-      // Circular Spinner intro plays for 1.8 seconds, then reveals the web app content/login
-      setTimeout(() => {
-        document.getElementById('introScreen').style.display = 'none';
-        checkLoginSession();
-      }, 1800);
+    function populateDropdown() {
+      const select = document.getElementById('exerciseSelect');
+      select.innerHTML = '<option value="">-- Choose an Exercise --</option>';
+      exercises.forEach((ex, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.innerText = ex.name;
+        select.appendChild(option);
+      });
+    }
 
-      renderHistory();
-    });
+    function getTodayString() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getCurrentMonthString() {
+      const d = new Date();
+      return `${d.getFullYear()}-${d.getMonth() + 1}`;
+    }
+
+    function checkStreakExpiry() {
+      if (!lastWorkoutDateStr) return;
+      const today = new Date(getTodayString());
+      const lastDate = new Date(lastWorkoutDateStr);
+      const diffTime = today - lastDate;
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1) {
+        if (!streakWasLost && streakCount > 0) {
+          backupStreakCount = streakCount;
+          localStorage.setItem('backupStreakCount', backupStreakCount.toString());
+          streakWasLost = true;
+          localStorage.setItem('streakWasLost', 'true');
+        }
+
+        streakCount = 0;
+        localStorage.setItem('workoutStreak', '0');
+        const streakBox = document.getElementById('streakDisplay');
+        streakBox.classList.add('streak-warning');
+        streakBox.innerText = `⚠️ Streak Lost! You missed a day.`;
+        
+        setupRestoreUI();
+      }
+    }
+
+    function setupRestoreUI() {
+      const restoreGroup = document.getElementById('restoreGroup');
+      const restoreBtn = document.getElementById('restoreBtn');
+      const currentMonth = getCurrentMonthString();
+
+      if (streakWasLost) {
+        restoreGroup.style.display = 'block';
+        if (lastRestoredMonth === currentMonth) {
+          restoreBtn.disabled = true;
+          restoreBtn.innerText = "⚡ Streak Restored (Available next month)";
+        } else {
+          restoreBtn.disabled = false;
+          restoreBtn.innerText = `⚡ Restore Lost Streak (${backupStreakCount} Days)`;
+        }
+      } else {
+        restoreGroup.style.display = 'none';
+      }
+    }
+
+    function restoreStreak() {
+      const currentMonth = getCurrentMonthString();
+      if (lastRestoredMonth === currentMonth || !streakWasLost) return;
+
+      playBeep(750, 0.15);
+      streakCount = backupStreakCount;
+      localStorage.setItem('workoutStreak', streakCount.toString());
+      lastRestoredMonth = currentMonth;
+      localStorage.setItem('lastRestoredMonth', currentMonth);
+      streakWasLost = false;
+      localStorage.setItem('streakWasLost', 'false');
+
+      const streakBox = document.getElementById('streakDisplay');
+      streakBox.classList.remove('streak-warning');
+      updateStreakDisplay();
+      setupRestoreUI();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function updateStreakDisplay() {
+      const streakBox = document.getElementById('streakDisplay');
+      if (!streakBox.classList.contains('streak-warning')) {
+        streakBox.innerText = `🔥 Daily Streak: ${streakCount} Day${streakCount === 1 ? '' : 's'}`;
+      }
+    }
 
     async function handleFormSubmit(event) {
       event.preventDefault();
@@ -464,43 +677,13 @@
       document.getElementById('auth-message').innerText = '';
     }
 
-    function populateDropdown() {
-      const select = document.getElementById('exerciseSelect');
-      select.innerHTML = '<option value="">-- Choose an Exercise --</option>';
-      exercises.forEach((ex, idx) => {
-        const option = document.createElement('option');
-        option.value = idx;
-        option.innerText = ex.name;
-        select.appendChild(option);
-      });
-    }
-
-    function getTodayString() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
-
-    function checkStreakExpiry() {
-      if (!lastWorkoutDateStr) return;
-      const today = new Date(getTodayString());
-      const lastDate = new Date(lastWorkoutDateStr);
-      const diffTime = today - lastDate;
-      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays > 1) {
-        streakCount = 0;
-        localStorage.setItem('workoutStreak', '0');
-        const streakBox = document.getElementById('streakDisplay');
-        streakBox.classList.add('streak-warning');
-        streakBox.innerText = `⚠️ Streak Lost! You missed a day.`;
-      }
-    }
-
-    function updateStreakDisplay() {
-      const streakBox = document.getElementById('streakDisplay');
-      if (!streakBox.classList.contains('streak-warning')) {
-        streakBox.innerText = `🔥 Daily Streak: ${streakCount} Day${streakCount === 1 ? '' : 's'}`;
-      }
+    function updateDailyGoalUI() {
+      const todayCompletedCount = workoutHistory.filter(item => item.completed).length;
+      const progressPercent = Math.min(Math.round((todayCompletedCount / dailyTarget) * 100), 100);
+      
+      document.getElementById('goalText').innerText = `🎯 Daily Goal: ${todayCompletedCount} / ${dailyTarget} Done`;
+      document.getElementById('goalPercent').innerText = `${progressPercent}%`;
+      document.getElementById('goalProgressFill').style.width = `${progressPercent}%`;
     }
 
     function setMode(mode, element) {
@@ -678,6 +861,7 @@
       const exRepsText = isCurrentlyEasier ? currentEx.easier[currentMode] : currentEx[currentMode];
 
       addHistoryEntry(exName, exRepsText, didComplete);
+      updateDailyGoalUI();
 
       if (didComplete) {
         const numericReps = parseInt(exRepsText) || 0;
@@ -690,13 +874,19 @@
 
         document.getElementById('statExerciseValue').innerText = exerciseLifetimeTotals[exName];
 
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-        const todayStr = getTodayString();
-        if (lastWorkoutDateStr !== todayStr) {
+        const todayDoneCount = workoutHistory.filter(item => item.completed).length;
+        if (todayDoneCount === dailyTarget) {
+          confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+        } else {
+          confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        }
+
+        const todayStrVal = getTodayString();
+        if (lastWorkoutDateStr !== todayStrVal) {
           streakCount++;
-          lastWorkoutDateStr = todayStr;
+          lastWorkoutDateStr = todayStrVal;
           localStorage.setItem('workoutStreak', streakCount.toString());
-          localStorage.setItem('lastWorkoutDateStr', todayStr);
+          localStorage.setItem('lastWorkoutDateStr', todayStrVal);
           updateStreakDisplay();
           feedbackMsg.className = 'feedback-msg msg-success';
           feedbackMsg.innerText = "🎉 Great job! Streak extended!";
@@ -719,6 +909,7 @@
       };
       workoutHistory.unshift(entry);
       localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
+      localStorage.setItem('workoutHistoryDate', getTodayString());
       renderHistory();
     }
 
@@ -745,8 +936,9 @@
     function clearHistory() {
       playBeep(300, 0.08);
       workoutHistory = [];
-      localStorage.removeItem('todayWorkoutHistory');
+      localStorage.setItem('todayWorkoutHistory', JSON.stringify([]));
       renderHistory();
+      updateDailyGoalUI();
     }
   </script>
 </body>
