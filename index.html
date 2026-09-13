@@ -248,6 +248,13 @@
           </select>
         </div>
         <div class="setting-group">
+          <span class="setting-label">Restore / Adjust Streak Count</span>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="manualStreakInput" class="setting-input" placeholder="Set days (e.g. 5)" style="margin-bottom:0;" />
+            <button class="btn btn-secondary" style="margin-top:0; padding: 8px 12px; font-size: 13px;" onclick="restoreStreakManual()">Apply</button>
+          </div>
+        </div>
+        <div class="setting-group">
           <div class="setting-row">
             <span class="setting-label" style="margin-bottom:0;">Dark / Light Theme</span>
             <label class="switch">
@@ -750,6 +757,21 @@
       saveProgressToSupabase();
     }
 
+    function restoreStreakManual() {
+      const val = parseInt(document.getElementById('manualStreakInput').value);
+      if (isNaN(val) || val < 0) {
+        alert('Please enter a valid number of days.');
+        return;
+      }
+      streakCount = val;
+      localStorage.setItem('workoutStreak', streakCount.toString());
+      updateStreakDisplay();
+      updateStatsUI();
+      saveProgressToSupabase();
+      alert(`Streak successfully set to ${streakCount} days!`);
+      document.getElementById('manualStreakInput').value = '';
+    }
+
     function setMode(mode, btnElement) {
       playBeep(520, 0.04);
       currentMode = mode;
@@ -795,6 +817,14 @@
       localStorage.setItem('customExercises', JSON.stringify(customExercises));
       rebuildActiveExercises();
       toggleCustomModal();
+      
+      document.getElementById('customName').value = '';
+      document.getElementById('customBeginner').value = '';
+      document.getElementById('customIntermediate').value = '';
+      document.getElementById('customPro').value = '';
+      document.getElementById('customTut').value = '';
+      document.getElementById('customVideo').value = '';
+      
       alert('Custom exercise added successfully!');
     }
 
