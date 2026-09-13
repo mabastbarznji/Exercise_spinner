@@ -366,6 +366,8 @@
     let currentMode = 'beginner';
     let timerInterval = null;
     let secondsLeft = 0;
+    
+    // Fallback load from local storage
     let streakCount = parseInt(localStorage.getItem('workoutStreak') || '0');
     let lastWorkoutDateStr = localStorage.getItem('lastWorkoutDateStr');
     let currentRestTime = 30;
@@ -579,7 +581,6 @@
 
       updateDumbbellQuickBtnUI();
       rebuildActiveExercises();
-      checkStreakExpiry();
       updateStreakDisplay();
       updateDailyGoalUI();
       updateStatsUI();
@@ -587,7 +588,7 @@
       setTimeout(() => {
         document.getElementById('introScreen').style.display = 'none';
         checkLoginSession();
-      }, 1800);
+      }, 1200);
 
       renderHistory();
     });
@@ -617,7 +618,8 @@
           .single();
 
         if (data) {
-          if (data.streak !== null) {
+          // Keep the highest streak value to prevent accidental resets
+          if (data.streak !== null && data.streak >= streakCount) {
             streakCount = data.streak;
             localStorage.setItem('workoutStreak', streakCount.toString());
           }
@@ -626,10 +628,10 @@
             localStorage.setItem('dailyTarget', dailyTarget.toString());
             document.getElementById('dailyTargetSelect').value = dailyTarget;
           }
-          if (data.today_history && savedHistoryDate === todayStr) {
+          if (data.today_history) {
             try {
               const cloudHistory = JSON.parse(data.today_history);
-              if (Array.isArray(cloudHistory) && cloudHistory.length > workoutHistory.length) {
+              if (Array.isArray(cloudHistory) && cloudHistory.length >= workoutHistory.length) {
                 workoutHistory = cloudHistory;
                 localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
               }
@@ -662,12 +664,12 @@
       saveProgressToSupabase();
     }
 
-    function checkLoginSession() {
+    async function checkLoginSession() {
       if (currentUserEmail) {
         document.getElementById('authGate').style.display = 'none';
         document.getElementById('appContent').style.display = 'block';
         document.getElementById('userDisplay').innerText = `👤 ${currentUserEmail}`;
-        loadProgressFromSupabase(currentUserEmail);
+        await loadProgressFromSupabase(currentUserEmail);
       } else {
         document.getElementById('authGate').style.display = 'block';
       }
@@ -1050,33 +1052,20 @@
       document.getElementById('goalProgressFill').style.width = `${percent}%`;
     }
 
-    function checkStreakExpiry() {
-      if (!lastWorkoutDateStr) return;
-      const lastDate = new Date(lastWorkoutDateStr);
-      const currentDate = new Date(todayStr);
-      const diffTime = Math.abs(currentDate - lastDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays > 1) {
-        streakCount = 0;
-        localStorage.setItem('workoutStreak', '0');
-      }
-    }
-
     function updateStreakOnComplete() {
       if (lastWorkoutDateStr === todayStr) return;
 
       if (!lastWorkoutDateStr) {
-        streakCount = 1;
+        streakCount = Math.max(streakCount, 1);
       } else {
         const lastDate = new Date(lastWorkoutDateStr);
         const currentDate = new Date(todayStr);
         const diffDays = Math.round((currentDate - lastDate) / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 1) {
-          streakCount++;
-        } else if (diffDays > 1) {
-          streakCount = 1;
+        if (diffDays <= 1) {
+          if (diffDays === 1) streakCount++;
+        } else {
+          streakCount = Math.max(streakCount, 1);
         }
       }
 
