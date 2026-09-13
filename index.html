@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Exercise Spinner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Exercise Spinner Pro</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -77,11 +79,11 @@
     .goal-progress-track { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
     .goal-progress-fill { height: 100%; background: #16a34a; width: 0%; transition: width 0.4s ease; }
 
-    .settings-modal { display: none; background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
-    .settings-modal h3 { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
+    .modal-panel { display: none; background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+    .modal-panel h3 { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
     .setting-group { margin-bottom: 12px; }
     .setting-label { font-size: 12px; font-weight: 600; color: var(--text-sub); display: block; margin-bottom: 4px; }
-    .setting-select { width: 100%; padding: 8px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; }
+    .setting-select, .setting-input { width: 100%; padding: 8px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; margin-bottom: 8px; }
     .setting-row { display: flex; justify-content: space-between; align-items: center; }
     .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -89,19 +91,26 @@
     .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
     input:checked + .slider { background-color: var(--accent); }
     input:checked + .slider:before { transform: translateX(22px); }
-    
-    .btn-restore { width: 100%; background: #d97706; color: white; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 4px; }
-    .btn-restore:hover { background: #b45309; }
-    .btn-restore:disabled { background: var(--border-color); color: var(--text-sub); cursor: not-allowed; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; color: var(--accent-text); }
+    .stat-title { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .badges-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .badge-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; opacity: 0.4; }
+    .badge-item.unlocked { opacity: 1; border-color: #16a34a; background: rgba(22, 163, 74, 0.1); color: #4ade80; }
 
     .streak-box { text-align: center; font-size: 14px; font-weight: 700; color: var(--accent-text); background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); }
-    .streak-warning { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
     .level-label { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
-    .mode-selection { display: flex; gap: 8px; margin-bottom: 16px; }
-    .mode-btn { flex: 1; padding: 10px 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-sub); border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+    .mode-selection { display: flex; gap: 6px; margin-bottom: 12px; }
+    .mode-btn { flex: 1; padding: 10px 2px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-sub); border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: center; }
     .mode-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
     
+    .dumbbell-quick-bar { margin-bottom: 16px; }
+    .btn-dumbbell-toggle { width: 100%; padding: 10px; border: 2px dashed var(--border-color); background: var(--bg-color); color: var(--text-sub); border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; text-align: center; }
+    .btn-dumbbell-toggle.active { background: rgba(37, 99, 235, 0.15); border-color: var(--accent); color: var(--accent-text); border-style: solid; box-shadow: 0 2px 10px rgba(37, 99, 235, 0.2); }
+
     .spinner-display { height: 120px; display: flex; align-items: center; justify-content: center; background: var(--bg-color); border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border-color); text-align: center; padding: 15px; }
     .spin-text { font-size: 18px; font-weight: 600; color: var(--text-sub); }
     
@@ -119,6 +128,8 @@
     .btn-easier:hover { opacity: 0.9; }
     .btn-rest { background: var(--card-bg); color: var(--accent-text); border: 1px solid var(--accent-text); margin-top: 8px; box-shadow: none; }
     .btn-rest:hover { background: rgba(56, 189, 248, 0.1); }
+    .btn-secondary { background: #16a34a; box-shadow: none; margin-top: 8px; }
+    .btn-secondary:hover { background: #15803d; }
     
     .timer-container { display: none; margin-top: 12px; text-align: center; }
     .timer-display { font-size: 32px; font-weight: 700; color: var(--accent-text); transition: color 0.3s ease; }
@@ -139,8 +150,10 @@
     .msg-success { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
     .msg-fail { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
     
-    .manual-picker-section { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
-    .select-dropdown { width: 100%; padding: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
+    .manual-picker-section { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); display: flex; gap: 8px; }
+    .select-dropdown { flex: 1; padding: 12px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; }
+    .btn-add-ex { background: var(--border-color); color: var(--text-main); border: none; width: 44px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-add-ex:hover { opacity: 0.8; }
 
     .history-section { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
     .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -166,7 +179,7 @@
       <div class="intro-spinner-circle">
         <div class="intro-main-title">What exercise should I do??</div>
       </div>
-      <div class="intro-sub">Spinning up your workout app...</div>
+      <div class="intro-sub">Spinning up your fitness app...</div>
     </div>
 
     <div id="authGate" class="auth-gate" style="display: none;">
@@ -195,11 +208,35 @@
       <div class="top-bar-settings">
         <h1>Exercise Spinner</h1>
         <div class="header-icons">
+          <button class="icon-btn" onclick="toggleStatsModal()" title="Stats & Badges">📊</button>
           <button class="icon-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
         </div>
       </div>
 
-      <div class="settings-modal" id="settingsModal">
+      <!-- Stats & Badges Dashboard Modal -->
+      <div class="modal-panel" id="statsModal">
+        <h3>📊 Lifetime Stats & Badges</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="statTotalWorkouts">0</div>
+            <div class="stat-title">Workouts Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statActiveDays">0</div>
+            <div class="stat-title">Active Days</div>
+          </div>
+        </div>
+        <span class="setting-label">Achievement Badges</span>
+        <div class="badges-container">
+          <div class="badge-item" id="badge-streak3">🔥 3-Day Streak</div>
+          <div class="badge-item" id="badge-streak7">🚀 7-Day Pro</div>
+          <div class="badge-item" id="badge-workout10">🎯 10 Workouts</div>
+          <div class="badge-item" id="badge-workout50">🏆 50 Workouts</div>
+        </div>
+      </div>
+
+      <!-- Settings Modal -->
+      <div class="modal-panel" id="settingsModal">
         <h3>⚙️ App Settings</h3>
         <div class="setting-group">
           <span class="setting-label">Daily Target (Completed Exercises)</span>
@@ -228,10 +265,18 @@
             </label>
           </div>
         </div>
-        <div class="setting-group" id="restoreGroup" style="margin-bottom: 0; display: none;">
-          <span class="setting-label">Streak Saver (1 use per month)</span>
-          <button class="btn-restore" id="restoreBtn" onclick="restoreStreak()">⚡ Restore Lost Streak</button>
-        </div>
+      </div>
+
+      <!-- Custom Exercise Modal -->
+      <div class="modal-panel" id="customModal">
+        <h3>➕ Add Custom Exercise</h3>
+        <input type="text" id="customName" class="setting-input" placeholder="Exercise Name (e.g. Burpees)" />
+        <input type="text" id="customBeginner" class="setting-input" placeholder="Beginner Reps (e.g. 5 Reps)" />
+        <input type="text" id="customIntermediate" class="setting-input" placeholder="Intermediate Reps (e.g. 12 Reps)" />
+        <input type="text" id="customPro" class="setting-input" placeholder="Pro Reps (e.g. 20 Reps)" />
+        <input type="text" id="customTut" class="setting-input" placeholder="Quick instructions/tutorial" />
+        <input type="text" id="customVideo" class="setting-input" placeholder="YouTube Video URL" />
+        <button class="btn btn-secondary" onclick="saveCustomExercise()">Save Exercise to Spinner</button>
       </div>
 
       <div class="goal-box">
@@ -253,6 +298,11 @@
         <button class="mode-btn" id="btn-pro" onclick="setMode('pro', this)">Pro</button>
       </div>
 
+      <!-- Big Dumbbell Mode Button -->
+      <div class="dumbbell-quick-bar">
+        <button class="btn-dumbbell-toggle" id="dumbbellQuickBtn" onclick="toggleDumbbellQuickMode()">🏋️ Dumbbell Mode Only: OFF</button>
+      </div>
+
       <div class="spinner-display" id="spinDisplay">
         <div class="spin-text" id="displayText">Pick a level & press Spin</div>
       </div>
@@ -260,6 +310,8 @@
       <button class="btn" id="spinBtn" onclick="spinExercise()">🎲 Spin Random Exercise</button>
 
       <div class="result-box" id="resultBox">
+        <div class="exercise-title" id="exTitle"></div>
+        <div class="reps-text" id="exReps"></div>
         <div class="tutorial-text" id="exTut"></div>
         <button class="btn btn-easier" id="easierBtn" onclick="switchToEasier()">⚡ Can't do this? Try an easier version</button>
         <button class="btn btn-rest" id="restBtn" onclick="startRest()">Start Rest</button>
@@ -284,10 +336,10 @@
       </div>
 
       <div class="manual-picker-section">
-        <div class="level-label">Or Pick Manually</div>
         <select class="select-dropdown" id="exerciseSelect" onchange="selectManualExercise()">
-          <option value="">-- Choose an Exercise --</option>
+          <option value="">-- Choose Manually --</option>
         </select>
+        <button class="btn-add-ex" onclick="toggleCustomModal()" title="Add Custom Exercise">+</button>
       </div>
 
       <div class="history-section">
@@ -313,12 +365,18 @@
     let currentExerciseIndex = null;
     let isCurrentlyEasier = false;
     let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+    let dumbbellModeOnly = localStorage.getItem('dumbbellModeOnly') === 'true';
     let dailyTarget = parseInt(localStorage.getItem('dailyTarget') || '5');
     let currentUserEmail = localStorage.getItem('currentUserEmail') || '';
     
-    let lastRestoredMonth = localStorage.getItem('lastRestoredMonth') || '';
-    let streakWasLost = localStorage.getItem('streakWasLost') === 'true';
-    let backupStreakCount = parseInt(localStorage.getItem('backupStreakCount') || '0');
+    let totalLifetimeWorkouts = parseInt(localStorage.getItem('totalLifetimeWorkouts') || '0');
+    let activeDaysCount = parseInt(localStorage.getItem('activeDaysCount') || '0');
+    let lastActiveDateRecorded = localStorage.getItem('lastActiveDateRecorded') || '';
+
+    function getTodayString() {
+      const d = new Date();
+      return d.toISOString().split('T')[0];
+    }
 
     const todayStr = getTodayString();
     let savedHistoryDate = localStorage.getItem('workoutHistoryDate');
@@ -332,6 +390,179 @@
       workoutHistory = JSON.parse(localStorage.getItem('todayWorkoutHistory') || '[]');
     }
 
+    const bodyweightExercises = [
+      { 
+        name: "Pull-Ups", beginner: "3 Reps", intermediate: "7 Reps", pro: "12 Reps", 
+        rest: { beginner: 45, intermediate: 60, pro: 90 }, 
+        tut: "Grip the bar palms facing away, pull your chest up to the bar, and lower down under full control.",
+        video: "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+        easier: { name: "Dead Hang", beginner: "15s", intermediate: "30s", pro: "45s", tut: "Grip the pull-up bar firmly with arms fully extended.", video: "https://www.youtube.com/watch?v=k5uWJnYqW60" }
+      },
+      { 
+        name: "Push-Ups", beginner: "5 Reps", intermediate: "12 Reps", pro: "25 Reps", 
+        rest: { beginner: 25, intermediate: 40, pro: 60 }, 
+        tut: "Keep hands shoulder-width apart, back straight, and lower chest near the floor.",
+        video: "https://www.youtube.com/watch?v=IODxDxX7oi4",
+        easier: { name: "Knee Push-Ups", beginner: "6 Reps", intermediate: "14 Reps", pro: "25 Reps", tut: "Rest your knees on the floor and lower your chest down.", video: "https://www.youtube.com/watch?v=jWxvty2KROs" }
+      },
+      { 
+        name: "Plank", beginner: "15 Seconds", intermediate: "35 Seconds", pro: "60 Seconds", 
+        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
+        tut: "Hold your body flat on your forearms and toes. Engage your core.",
+        video: "https://www.youtube.com/watch?v=ASdvN_XDn-c",
+        easier: { name: "Knee Plank", beginner: "15s", intermediate: "30s", pro: "45s", tut: "Support upper body on forearms while resting knees on ground.", video: "https://www.youtube.com/watch?v=mZunndfshQA" }
+      },
+      { 
+        name: "Bodyweight Squats", beginner: "8 Reps", intermediate: "18 Reps", pro: "30 Reps", 
+        rest: { beginner: 20, intermediate: 35, pro: 50 }, 
+        tut: "Keep feet shoulder-width apart, lower hips as if sitting down, and push up.",
+        video: "https://www.youtube.com/watch?v=YaXPRqUwItQ",
+        easier: { name: "Chair Squats", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", tut: "Stand in front of a chair, slowly sit back until thighs touch, then press up.", video: "https://www.youtube.com/watch?v=xDuwGrGlhAI" }
+      },
+      { 
+        name: "Lunges", beginner: "6 Reps / Leg", intermediate: "12 Reps / Leg", pro: "20 Reps / Leg", 
+        rest: { beginner: 25, intermediate: 40, pro: 60 }, 
+        tut: "Step forward with one leg, lower hips until both knees are bent at a 90-degree angle.",
+        video: "https://www.youtube.com/watch?v=D7KaRcUTQeE",
+        easier: { name: "Reverse Lunges", beginner: "5 Reps / Leg", intermediate: "10 Reps / Leg", pro: "15 Reps / Leg", tut: "Step backward into a lunge for better knee stability.", video: "https://www.youtube.com/watch?v=O0V5tqC0bAQ" }
+      },
+      { 
+        name: "Mountain Climbers", beginner: "20 Reps", intermediate: "40 Reps", pro: "60 Reps", 
+        rest: { beginner: 25, intermediate: 35, pro: 50 }, 
+        tut: "From a push-up position, alternate driving your knees toward your chest quickly.",
+        video: "https://www.youtube.com/watch?v=nmwgirgXLYM",
+        easier: { name: "Slow Mountain Climbers", beginner: "15 Reps", intermediate: "30 Reps", pro: "45 Reps", tut: "Step your knees forward slowly and with control.", video: "https://www.youtube.com/watch?v=cNI_fcJsZUs" }
+      },
+      { 
+        name: "Burpees", beginner: "4 Reps", intermediate: "10 Reps", pro: "18 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Drop into a squat, kick your feet back into a push-up, jump back in, and explode upward.",
+        video: "https://www.youtube.com/watch?v=auBLPXO8Fww",
+        easier: { name: "No-Jump Burpees", beginner: "4 Reps", intermediate: "8 Reps", pro: "14 Reps", tut: "Step back into plank instead of jumping, and stand up without the jump.", video: "https://www.youtube.com/watch?v=79p0T0Z88W0" }
+      },
+      { 
+        name: "Dips (Chair/Bench)", beginner: "5 Reps", intermediate: "12 Reps", pro: "20 Reps", 
+        rest: { beginner: 25, intermediate: 40, pro: 60 }, 
+        tut: "Place hands on the edge of a chair or bench, slide your hips off, and bend your elbows to lower your body.",
+        video: "https://www.youtube.com/watch?v=0326dy_-CzM",
+        easier: { name: "Bent-Knee Dips", beginner: "5 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Bend your knees at 90 degrees to reduce body weight load.", video: "https://www.youtube.com/watch?v=0326dy_-CzM" }
+      },
+      { 
+        name: "Russian Twists", beginner: "12 Reps", intermediate: "24 Reps", pro: "40 Reps", 
+        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
+        tut: "Sit on the floor, lean back slightly, lift feet, and twist your torso from side to side.",
+        video: "https://www.youtube.com/watch?v=wkD8rjkodUI",
+        easier: { name: "Heel-Touch Russian Twists", beginner: "10 Reps", intermediate: "20 Reps", pro: "30 Reps", tut: "Keep your heels resting flat on the floor for more stability.", video: "https://www.youtube.com/watch?v=wkD8rjkodUI" }
+      },
+      { 
+        name: "Glute Bridges", beginner: "10 Reps", intermediate: "20 Reps", pro: "35 Reps", 
+        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
+        tut: "Lie on your back with knees bent and feet flat, lift your hips toward the ceiling squeezing glutes.",
+        video: "https://www.youtube.com/watch?v=wPM8icPu6H8",
+        easier: { name: "Short Hold Bridges", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", tut: "Pause for 2 seconds at the top of each bridge repetition.", video: "https://www.youtube.com/watch?v=wPM8icPu6H8" }
+      },
+      { 
+        name: "Jumping Jacks", beginner: "20 Reps", intermediate: "40 Reps", pro: "70 Reps", 
+        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
+        tut: "Jump while raising your arms overhead and bringing legs out to the sides simultaneously.",
+        video: "https://www.youtube.com/watch?v=c4DAnQ6DtF8",
+        easier: { name: "Step Jacks", beginner: "15 Reps", intermediate: "30 Reps", pro: "50 Reps", tut: "Step side-to-side without jumping to keep it low impact.", video: "https://www.youtube.com/watch?v=c4DAnQ6DtF8" }
+      },
+      { 
+        name: "High Knees", beginner: "20 Secs", intermediate: "40 Secs", pro: "60 Secs", 
+        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
+        tut: "Run in place while driving your knees up as high toward your chest as possible.",
+        video: "https://www.youtube.com/watch?v=ZZZoXQ2OWIk",
+        easier: { name: "Marching in Place", beginner: "20 Secs", intermediate: "40 Secs", pro: "60 Secs", tut: "March in place bringing knees up at a controlled, steady pace.", video: "https://www.youtube.com/watch?v=ZZZoXQ2OWIk" }
+      }
+    ];
+
+    const dumbbellExercisesList = [
+      { 
+        name: "Dumbbell Bicep Curls", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold dumbbells at your sides, keep elbows close to your torso, and curl the weights up toward your shoulders.",
+        video: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
+        easier: { name: "Light Dumbbell Curls", beginner: "6 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Use lighter weights and control the movement up and down.", video: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo" }
+      },
+      { 
+        name: "Dumbbell Shoulder Press", beginner: "6 Reps", intermediate: "12 Reps", pro: "20 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold dumbbells at shoulder height and press them straight overhead until your arms are fully extended.",
+        video: "https://www.youtube.com/watch?v=qEwKCR5JCog",
+        easier: { name: "Seated Dumbbell Press", beginner: "6 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Sit on a chair for extra core and back support while pressing.", video: "https://www.youtube.com/watch?v=qEwKCR5JCog" }
+      },
+      { 
+        name: "Dumbbell Goblet Squats", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold one dumbbell vertically against your chest with both hands, squat down deep, keeping your chest up.",
+        video: "https://www.youtube.com/watch?v=MeIiIdhvXT4",
+        easier: { name: "Bodyweight Squats", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", tut: "Perform regular bodyweight squats without holding weights.", video: "https://www.youtube.com/watch?v=YaXPRqUwItQ" }
+      },
+      { 
+        name: "Dumbbell Bent-Over Rows", beginner: "8 Reps", intermediate: "14 Reps", pro: "22 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hinge forward at your hips with a flat back, and pull the dumbbells up toward your lower ribcage.",
+        video: "https://www.youtube.com/watch?v=pShjMPEGdVE",
+        easier: { name: "Supported Dumbbell Rows", beginner: "6 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Rest one hand and knee on a bench for support while rowing.", video: "https://www.youtube.com/watch?v=pShjMPEGdVE" }
+      },
+      { 
+        name: "Dumbbell Lunges", beginner: "6 Reps / Leg", intermediate: "12 Reps / Leg", pro: "18 Reps / Leg", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold dumbbells in each hand at your sides and step forward into a lunge with each leg.",
+        video: "https://www.youtube.com/watch?v=D7KaRcUTQeE",
+        easier: { name: "Bodyweight Lunges", beginner: "6 Reps / Leg", intermediate: "10 Reps / Leg", pro: "15 Reps / Leg", tut: "Perform lunges without holding weights.", video: "https://www.youtube.com/watch?v=D7KaRcUTQeE" }
+      },
+      { 
+        name: "Dumbbell Romanian Deadlifts", beginner: "8 Reps", intermediate: "15 Reps", pro: "22 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold dumbbells in front of thighs, hinge at hips keeping back flat, lowering weights along shins.",
+        video: "https://www.youtube.com/watch?v=JCllpFr6SDo",
+        easier: { name: "Bodyweight Good Mornings", beginner: "8 Reps", intermediate: "12 Reps", pro: "20 Reps", tut: "Practice hip hinges with hands behind your head without dumbbells.", video: "https://www.youtube.com/watch?v=JCllpFr6SDo" }
+      },
+      { 
+        name: "Dumbbell Lateral Raises", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", 
+        rest: { beginner: 25, intermediate: 40, pro: 55 }, 
+        tut: "Hold light dumbbells at your sides and raise your arms out to the sides up to shoulder height.",
+        video: "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+        easier: { name: "Lighter Lateral Raises", beginner: "6 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Use very light dumbbells or water bottles to focus on shoulder form.", video: "https://www.youtube.com/watch?v=3VcKaXpzqRo" }
+      },
+      { 
+        name: "Dumbbell Floor Press", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Lie flat on your back with dumbbells, press weights up until arms are extended over chest.",
+        video: "https://www.youtube.com/watch?v=6rLgwl9Z-rk",
+        easier: { name: "Push-Ups", beginner: "5 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Perform standard bodyweight push-ups instead.", video: "https://www.youtube.com/watch?v=IODxDxX7oi4" }
+      },
+      { 
+        name: "Dumbbell Thrusters", beginner: "6 Reps", intermediate: "12 Reps", pro: "20 Reps", 
+        rest: { beginner: 35, intermediate: 50, pro: 70 }, 
+        tut: "Hold dumbbells at shoulders, squat down deep, and as you rise up press the dumbbells overhead in one fluid motion.",
+        video: "https://www.youtube.com/watch?v=r7s1Ku0XkV4",
+        easier: { name: "Squat and Press Separately", beginner: "5 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Complete the squat fully, stand up, and then perform the overhead press separately.", video: "https://www.youtube.com/watch?v=r7s1Ku0XkV4" }
+      },
+      { 
+        name: "Dumbbell Hammer Curls", beginner: "8 Reps", intermediate: "15 Reps", pro: "22 Reps", 
+        rest: { beginner: 30, intermediate: 45, pro: 60 }, 
+        tut: "Hold dumbbells with palms facing each other (neutral grip) and curl weights up toward shoulders.",
+        video: "https://www.youtube.com/watch?v=zC3nLlEvin4",
+        easier: { name: "Light Hammer Curls", beginner: "6 Reps", intermediate: "10 Reps", pro: "15 Reps", tut: "Use lighter dumbbells focusing on controlled movement.", video: "https://www.youtube.com/watch?v=zC3nLlEvin4" }
+      }
+    ];
+
+    let customExercises = JSON.parse(localStorage.getItem('customExercises') || '[]');
+    let exercises = [];
+
+    function rebuildActiveExercises() {
+      if (dumbbellModeOnly) {
+        exercises = [...dumbbellExercisesList];
+      } else {
+        exercises = [...bodyweightExercises, ...dumbbellExercisesList];
+      }
+      exercises = exercises.concat(customExercises);
+      populateDropdown();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('soundToggle').checked = soundEnabled;
       document.getElementById('dailyTargetSelect').value = dailyTarget;
@@ -339,10 +570,12 @@
       const currentTheme = document.body.getAttribute('data-theme');
       document.getElementById('themeToggleCheckbox').checked = (currentTheme === 'light');
 
+      updateDumbbellQuickBtnUI();
+      rebuildActiveExercises();
       checkStreakExpiry();
       updateStreakDisplay();
       updateDailyGoalUI();
-      populateDropdown();
+      updateStatsUI();
 
       setTimeout(() => {
         document.getElementById('introScreen').style.display = 'none';
@@ -352,7 +585,6 @@
       renderHistory();
     });
 
-    // Supabase Cloud Sync Functions
     async function saveProgressToSupabase() {
       if (!currentUserEmail) return;
       try {
@@ -361,7 +593,8 @@
           .upsert({ 
             email: currentUserEmail, 
             streak: streakCount, 
-            daily_goals: dailyTarget.toString() 
+            daily_goals: dailyTarget.toString(),
+            today_history: JSON.stringify(workoutHistory)
           }, { onConflict: 'email' });
       } catch (err) {
         console.error('Error saving to cloud:', err);
@@ -370,9 +603,9 @@
 
     async function loadProgressFromSupabase(email) {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
-          .select('streak, daily_goals')
+          .select('streak, daily_goals, today_history')
           .eq('email', email)
           .single();
 
@@ -386,11 +619,22 @@
             localStorage.setItem('dailyTarget', dailyTarget.toString());
             document.getElementById('dailyTargetSelect').value = dailyTarget;
           }
+          if (data.today_history && savedHistoryDate === todayStr) {
+            try {
+              const cloudHistory = JSON.parse(data.today_history);
+              if (Array.isArray(cloudHistory) && cloudHistory.length > workoutHistory.length) {
+                workoutHistory = cloudHistory;
+                localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
+              }
+            } catch(e) {}
+          }
           updateStreakDisplay();
           updateDailyGoalUI();
+          updateStatsUI();
+          renderHistory();
         }
       } catch (err) {
-        console.log('No previous cloud record found for this user.');
+        console.log('No previous cloud record found.');
       }
     }
 
@@ -402,12 +646,9 @@
         document.getElementById('auth-message').innerText = "Password must be at least 6 characters.";
         return;
       }
-      
       currentUserEmail = email;
       localStorage.setItem('currentUserEmail', email);
-      
       await loadProgressFromSupabase(email);
-      
       document.getElementById('authGate').style.display = 'none';
       document.getElementById('appContent').style.display = 'block';
       document.getElementById('userDisplay').innerText = `👤 ${email}`;
@@ -450,382 +691,394 @@
 
     function toggleSettings() {
       playBeep(480, 0.05);
+      document.getElementById('statsModal').style.display = 'none';
+      document.getElementById('customModal').style.display = 'none';
       const modal = document.getElementById('settingsModal');
       modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleStatsModal() {
+      playBeep(480, 0.05);
+      document.getElementById('settingsModal').style.display = 'none';
+      document.getElementById('customModal').style.display = 'none';
+      const modal = document.getElementById('statsModal');
+      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+      updateStatsUI();
+    }
+
+    function toggleCustomModal() {
+      playBeep(480, 0.05);
+      document.getElementById('settingsModal').style.display = 'none';
+      document.getElementById('statsModal').style.display = 'none';
+      const modal = document.getElementById('customModal');
+      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleThemeSetting() {
+      const isLight = document.getElementById('themeToggleCheckbox').checked;
+      document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
     }
 
     function toggleSoundSetting() {
       soundEnabled = document.getElementById('soundToggle').checked;
       localStorage.setItem('soundEnabled', soundEnabled);
+    }
+
+    function toggleDumbbellQuickMode() {
       playBeep(600, 0.08);
+      dumbbellModeOnly = !dumbbellModeOnly;
+      localStorage.setItem('dumbbellModeOnly', dumbbellModeOnly);
+      updateDumbbellQuickBtnUI();
+      rebuildActiveExercises();
+    }
+
+    function updateDumbbellQuickBtnUI() {
+      const btn = document.getElementById('dumbbellQuickBtn');
+      if (dumbbellModeOnly) {
+        btn.classList.add('active');
+        btn.textContent = "🏋️ Dumbbell Mode Only: ON";
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = "🏋️ Dumbbell Mode Only: OFF";
+      }
     }
 
     function updateDailyTargetSettings() {
       dailyTarget = parseInt(document.getElementById('dailyTargetSelect').value);
       localStorage.setItem('dailyTarget', dailyTarget);
-      playBeep(550, 0.08);
       updateDailyGoalUI();
       saveProgressToSupabase();
     }
 
-    function toggleThemeSetting() {
-      playBeep(450, 0.05);
-      const isChecked = document.getElementById('themeToggleCheckbox').checked;
-      const newTheme = isChecked ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('workoutTheme', newTheme);
+    function setMode(mode, btnElement) {
+      playBeep(520, 0.04);
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
     }
 
-    const savedTheme = localStorage.getItem('workoutTheme');
-    if (savedTheme) { document.body.setAttribute('data-theme', savedTheme); }
-
-    const exercises = [
-      { 
-        name: "Pull-Ups", beginner: "3 Reps", intermediate: "7 Reps", pro: "12 Reps", 
-        rest: { beginner: 45, intermediate: 60, pro: 90 }, 
-        tut: "Grip the bar palms facing away, pull your chest up to the bar, and lower down under full control.",
-        video: "https://www.youtube.com/watch?v=eGo4IYlbE5g",
-        easier: { name: "Dead Hang (Bar Hold)", beginner: "15 Seconds", intermediate: "30 Seconds", pro: "45 Seconds", tut: "Grip the pull-up bar firmly with arms fully extended.", video: "https://www.youtube.com/watch?v=k5uWJnYqW60" }
-      },
-      { 
-        name: "Push-Ups", beginner: "5 Reps", intermediate: "12 Reps", pro: "25 Reps", 
-        rest: { beginner: 25, intermediate: 40, pro: 60 }, 
-        tut: "Keep your hands shoulder-width apart, keep your back straight, and lower your chest near the floor.",
-        video: "https://www.youtube.com/watch?v=IODxDxX7oi4",
-        easier: { name: "Knee Push-Ups", beginner: "6 Reps", intermediate: "14 Reps", pro: "25 Reps", tut: "Rest your knees on the floor, cross your ankles behind you, and lower your chest down.", video: "https://www.youtube.com/watch?v=jWxvty2KROs" }
-      },
-      { 
-        name: "Plank", beginner: "15 Seconds", intermediate: "35 Seconds", pro: "60 Seconds", 
-        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
-        tut: "Hold your body flat on your forearms and toes. Engage your core and keep your hips aligned.",
-        video: "https://www.youtube.com/watch?v=ASdvN_XDn-c",
-        easier: { name: "Knee Plank", beginner: "15 Seconds", intermediate: "30 Seconds", pro: "45 Seconds", tut: "Support your upper body on your forearms while resting your knees on the ground.", video: "https://www.youtube.com/watch?v=mZunndfshQA" }
-      },
-      { 
-        name: "Bodyweight Squats", beginner: "8 Reps", intermediate: "18 Reps", pro: "30 Reps", 
-        rest: { beginner: 20, intermediate: 35, pro: 50 }, 
-        tut: "Keep feet shoulder-width apart, lower your hips as if sitting down, and push up through your heels.",
-        video: "https://www.youtube.com/watch?v=YaXPRqUwItQ",
-        easier: { name: "Chair Squats", beginner: "8 Reps", intermediate: "15 Reps", pro: "25 Reps", tut: "Stand in front of a chair, slowly sit back until your thighs touch, then press up.", video: "https://www.youtube.com/watch?v=xDuwGrGlhAI" }
-      },
-      { 
-        name: "Lunges", beginner: "4 Reps / leg", intermediate: "10 Reps / leg", pro: "16 Reps / leg", 
-        rest: { beginner: 25, intermediate: 35, pro: 50 }, 
-        tut: "Step forward, drop your back knee close to the floor at 90 degrees, then push back to start.",
-        video: "https://www.youtube.com/watch?v=QOVaHwm-Q6U",
-        easier: { name: "Static Reverse Lunges", beginner: "4 Reps / leg", intermediate: "8 Reps / leg", pro: "14 Reps / leg", tut: "Step backward with one leg and lower your knee slightly.", video: "https://www.youtube.com/watch?v=D7KaRcUTQeE" }
-      },
-      { 
-        name: "Mountain Climbers", beginner: "10 Reps", intermediate: "24 Reps", pro: "40 Reps", 
-        rest: { beginner: 20, intermediate: 30, pro: 45 }, 
-        tut: "In a high plank position, drive your knees toward your chest quickly in an alternating motion.",
-        video: "https://www.youtube.com/watch?v=nmwgirgXLYM",
-        easier: { name: "Slow High Knees", beginner: "12 Reps", intermediate: "20 Reps", pro: "30 Reps", tut: "Stand up straight and lift one knee up toward your chest at a steady pace.", video: "https://www.youtube.com/watch?v=8opcQdC-PkU" }
-      }
-    ];
-
     function populateDropdown() {
-      const select = document.getElementById('exerciseSelect');
-      select.innerHTML = '<option value="">-- Choose an Exercise --</option>';
+      const dropdown = document.getElementById('exerciseSelect');
+      dropdown.innerHTML = '<option value="">-- Choose Manually --</option>';
       exercises.forEach((ex, idx) => {
-        const option = document.createElement('option');
-        option.value = idx;
-        option.innerText = ex.name;
-        select.appendChild(option);
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = ex.name;
+        dropdown.appendChild(opt);
       });
     }
 
-    function getTodayString() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
+    function saveCustomExercise() {
+      const name = document.getElementById('customName').value.trim();
+      const beginner = document.getElementById('customBeginner').value.trim();
+      const intermediate = document.getElementById('customIntermediate').value.trim();
+      const pro = document.getElementById('customPro').value.trim();
+      const tut = document.getElementById('customTut').value.trim();
+      const video = document.getElementById('customVideo').value.trim();
 
-    function getCurrentMonthString() {
-      const d = new Date();
-      return `${d.getFullYear()}-${d.getMonth() + 1}`;
-    }
-
-    function checkStreakExpiry() {
-      if (!lastWorkoutDateStr) return;
-      const today = new Date(getTodayString());
-      const lastDate = new Date(lastWorkoutDateStr);
-      const diffDays = Math.round((today - lastDate) / (1000 * 60 * 60 * 24));
-
-      if (diffDays > 1) {
-        if (!streakWasLost && streakCount > 0) {
-          backupStreakCount = streakCount;
-          localStorage.setItem('backupStreakCount', backupStreakCount.toString());
-          streakWasLost = true;
-          localStorage.setItem('streakWasLost', 'true');
-        }
-        streakCount = 0;
-        localStorage.setItem('workoutStreak', '0');
-        const streakBox = document.getElementById('streakDisplay');
-        streakBox.classList.add('streak-warning');
-        streakBox.innerText = `⚠️ Streak Lost! You missed a day.`;
-        setupRestoreUI();
-        saveProgressToSupabase();
+      if (!name) {
+        alert('Please give your exercise a name.');
+        return;
       }
-    }
 
-    function setupRestoreUI() {
-      const restoreGroup = document.getElementById('restoreGroup');
-      const restoreBtn = document.getElementById('restoreBtn');
-      const currentMonth = getCurrentMonthString();
+      const newEx = {
+        name,
+        beginner: beginner || "10 Reps",
+        intermediate: intermediate || "15 Reps",
+        pro: pro || "25 Reps",
+        rest: { beginner: 30, intermediate: 45, pro: 60 },
+        tut: tut || "Perform with standard proper form and pace.",
+        video: video || ""
+      };
 
-      if (streakWasLost) {
-        restoreGroup.style.display = 'block';
-        if (lastRestoredMonth === currentMonth) {
-          restoreBtn.disabled = true;
-          restoreBtn.innerText = "⚡ Streak Restored (Available next month)";
-        } else {
-          restoreBtn.disabled = false;
-          restoreBtn.innerText = `⚡ Restore Lost Streak (${backupStreakCount} Days)`;
-        }
-      } else {
-        restoreGroup.style.display = 'none';
-      }
-    }
-
-    function restoreStreak() {
-      const currentMonth = getCurrentMonthString();
-      if (lastRestoredMonth === currentMonth || !streakWasLost) return;
-
-      playBeep(750, 0.15);
-      streakCount = backupStreakCount;
-      localStorage.setItem('workoutStreak', streakCount.toString());
-      lastRestoredMonth = currentMonth;
-      localStorage.setItem('lastRestoredMonth', currentMonth);
-      streakWasLost = false;
-      localStorage.setItem('streakWasLost', 'false');
-
-      const streakBox = document.getElementById('streakDisplay');
-      streakBox.classList.remove('streak-warning');
-      updateStreakDisplay();
-      setupRestoreUI();
-      saveProgressToSupabase();
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-    }
-
-    function setMode(mode, btn) {
-      playBeep(520, 0.05);
-      currentMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      customExercises.push(newEx);
+      localStorage.setItem('customExercises', JSON.stringify(customExercises));
+      rebuildActiveExercises();
+      toggleCustomModal();
+      alert('Custom exercise added successfully!');
     }
 
     function spinExercise() {
-      playBeep(650, 0.1);
-      isCurrentlyEasier = false;
-      currentExerciseIndex = Math.floor(Math.random() * exercises.length);
-      const ex = exercises[currentExerciseIndex];
+      playBeep(700, 0.1);
+      const display = document.getElementById('displayText');
+      const spinBtn = document.getElementById('spinBtn');
+      spinBtn.disabled = true;
       
+      let counter = 0;
+      const shuffleInterval = setInterval(() => {
+        const randomEx = exercises[Math.floor(Math.random() * exercises.length)];
+        display.textContent = randomEx.name;
+        counter++;
+        if (counter > 10) {
+          clearInterval(shuffleInterval);
+          finalizeSpin();
+        }
+      }, 80);
+    }
+
+    function finalizeSpin() {
+      const randomIndex = Math.floor(Math.random() * exercises.length);
+      displayExercise(randomIndex);
+      document.getElementById('spinBtn').disabled = false;
+    }
+
+    function selectManualExercise() {
+      const dropdown = document.getElementById('exerciseSelect');
+      const val = dropdown.value;
+      if (val !== "") {
+        displayExercise(parseInt(val));
+        dropdown.value = "";
+      }
+    }
+
+    function displayExercise(index) {
+      currentExerciseIndex = index;
+      isCurrentlyEasier = false;
+      const ex = exercises[index];
+
       document.getElementById('spinDisplay').style.display = 'none';
       const resultBox = document.getElementById('resultBox');
       resultBox.style.display = 'block';
 
-      document.getElementById('exTut').innerHTML = `
-        <div class="exercise-title">${ex.name}</div>
-        <div class="reps-text">${ex[currentMode]}</div>
-        <div style="margin-bottom:10px;">${ex.tut}</div>
-        <a href="${ex.video}" target="_blank" class="video-link">▶ Watch YouTube Tutorial</a>
-      `;
-      document.getElementById('easierBtn').innerText = "⚡ Can't do this? Try an easier version";
+      document.getElementById('exTitle').textContent = ex.name;
+      document.getElementById('exReps').textContent = `Target (${currentMode.toUpperCase()}) — ${ex[currentMode]}`;
+      
+      let tutHTML = ex.tut;
+      if (ex.video) {
+        tutHTML += `<br><a href="${ex.video}" target="_blank" class="video-link">▶ Watch video guide</a>`;
+      }
+      document.getElementById('exTut').innerHTML = tutHTML;
+
+      const easierBtn = document.getElementById('easierBtn');
+      if (ex.easier) {
+        easierBtn.style.display = 'block';
+        easierBtn.textContent = `⚡ Can't do this? Try easier: ${ex.easier.name}`;
+      } else {
+        easierBtn.style.display = 'none';
+      }
+
+      document.getElementById('restBtn').style.display = 'block';
       document.getElementById('timerContainer').style.display = 'none';
       document.getElementById('confirmBox').style.display = 'none';
       document.getElementById('feedbackMsg').style.display = 'none';
     }
 
     function switchToEasier() {
-      playBeep(400, 0.08);
-      if (currentExerciseIndex === null) return;
+      playBeep(450, 0.06);
       const ex = exercises[currentExerciseIndex];
-      isCurrentlyEasier = !isCurrentlyEasier;
+      if (!ex.easier) return;
+      isCurrentlyEasier = true;
 
-      if (isCurrentlyEasier) {
-        document.getElementById('exTut').innerHTML = `
-          <div class="exercise-title">${ex.easier.name} (Easier)</div>
-          <div class="reps-text">${ex.easier[currentMode]}</div>
-          <div style="margin-bottom:10px;">${ex.easier.tut}</div>
-          <a href="${ex.easier.video}" target="_blank" class="video-link">▶ Watch YouTube Tutorial</a>
-        `;
-        document.getElementById('easierBtn').innerText = "🔄 Switch back to standard version";
-      } else {
-        document.getElementById('exTut').innerHTML = `
-          <div class="exercise-title">${ex.name}</div>
-          <div class="reps-text">${ex[currentMode]}</div>
-          <div style="margin-bottom:10px;">${ex.tut}</div>
-          <a href="${ex.video}" target="_blank" class="video-link">▶ Watch YouTube Tutorial</a>
-        `;
-        document.getElementById('easierBtn').innerText = "⚡ Can't do this? Try an easier version";
+      document.getElementById('exTitle').textContent = ex.easier.name + " (Easier Version)";
+      document.getElementById('exReps').textContent = `Target (${currentMode.toUpperCase()}) — ${ex.easier[currentMode] || ex.easier.beginner}`;
+      
+      let tutHTML = ex.easier.tut;
+      if (ex.easier.video) {
+        tutHTML += `<br><a href="${ex.easier.video}" target="_blank" class="video-link">▶ Watch video guide</a>`;
       }
-    }
-
-    function selectManualExercise() {
-      const select = document.getElementById('exerciseSelect');
-      const idx = select.value;
-      if (idx === "") return;
-      playBeep(650, 0.1);
-      isCurrentlyEasier = false;
-      currentExerciseIndex = parseInt(idx);
-      const ex = exercises[currentExerciseIndex];
-
-      document.getElementById('spinDisplay').style.display = 'none';
-      const resultBox = document.getElementById('resultBox');
-      resultBox.style.display = 'block';
-
-      document.getElementById('exTut').innerHTML = `
-        <div class="exercise-title">${ex.name}</div>
-        <div class="reps-text">${ex[currentMode]}</div>
-        <div style="margin-bottom:10px;">${ex.tut}</div>
-        <a href="${ex.video}" target="_blank" class="video-link">▶ Watch YouTube Tutorial</a>
-      `;
-      document.getElementById('easierBtn').innerText = "⚡ Can't do this? Try an easier version";
-      document.getElementById('timerContainer').style.display = 'none';
-      document.getElementById('confirmBox').style.display = 'none';
-      document.getElementById('feedbackMsg').style.display = 'none';
-      select.value = "";
+      document.getElementById('exTut').innerHTML = tutHTML;
+      document.getElementById('easierBtn').style.display = 'none';
     }
 
     function startRest() {
-      playBeep(700, 0.1);
-      if (currentExerciseIndex === null) return;
+      playBeep(650, 0.08);
       const ex = exercises[currentExerciseIndex];
-      currentRestTime = ex.rest[currentMode];
-      secondsLeft = currentRestTime;
+      currentRestTime = ex.rest ? ex.rest[currentMode] : 30;
 
-      document.getElementById('timerContainer').style.display = 'block';
-      document.getElementById('timer').innerText = secondsLeft;
-      document.getElementById('timer').classList.remove('time-up');
+      document.getElementById('restBtn').style.display = 'none';
+      const timerContainer = document.getElementById('timerContainer');
+      timerContainer.style.display = 'block';
+
+      secondsLeft = currentRestTime;
+      updateTimerDisplay();
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         secondsLeft--;
-        document.getElementById('timer').innerText = secondsLeft;
-        if (secondsLeft <= 3 && secondsLeft > 0) {
-          playBeep(500, 0.06);
-        }
+        updateTimerDisplay();
         if (secondsLeft <= 0) {
           clearInterval(timerInterval);
           playBeep(880, 0.2, 'square');
-          document.getElementById('timer').innerText = "Rest Over! Complete Set 👇";
+          document.getElementById('timer').textContent = "Rest Over! Let's Go!";
           document.getElementById('timer').classList.add('time-up');
           document.getElementById('confirmBox').style.display = 'block';
+        } else if (secondsLeft <= 3) {
+          playBeep(500, 0.05);
         }
       }, 1000);
     }
 
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer');
+      timerEl.classList.remove('time-up');
+      const mins = Math.floor(secondsLeft / 60);
+      const secs = secondsLeft % 60;
+      timerEl.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
     function addRestTime(sec) {
-      playBeep(600, 0.05);
+      playBeep(550, 0.05);
       secondsLeft += sec;
-      document.getElementById('timer').innerText = secondsLeft;
+      updateTimerDisplay();
     }
 
     function skipRest() {
-      playBeep(500, 0.08);
+      playBeep(400, 0.05);
       clearInterval(timerInterval);
       document.getElementById('timerContainer').style.display = 'none';
       document.getElementById('confirmBox').style.display = 'block';
     }
 
-    function handleCompletion(success) {
-      if (currentExerciseIndex === null) return;
+    function handleCompletion(completed) {
+      clearInterval(timerInterval);
+      document.getElementById('confirmBox').style.display = 'none';
+      document.getElementById('timerContainer').style.display = 'none';
+
       const ex = exercises[currentExerciseIndex];
-      const exName = isCurrentlyEasier ? ex.easier.name : ex.name;
-      const exReps = isCurrentlyEasier ? ex.easier[currentMode] : ex[currentMode];
+      const activeName = isCurrentlyEasier ? ex.easier.name : ex.name;
+      const activeReps = isCurrentlyEasier ? (ex.easier[currentMode] || ex.easier.beginner) : ex[currentMode];
 
       const feedback = document.getElementById('feedbackMsg');
       feedback.style.display = 'block';
 
-      const historyItem = { name: exName, reps: exReps, status: success ? 'Completed' : 'Skipped' };
-      workoutHistory.push(historyItem);
-      localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
-      renderHistory();
-
-      if (success) {
-        playBeep(900, 0.15);
-        feedback.className = "feedback-msg msg-success";
-        feedback.innerText = "🎉 Awesome job! Set logged successfully.";
-        confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
-
-        const today = getTodayString();
-        if (lastWorkoutDateStr !== today) {
-          if (!lastWorkoutDateStr) {
-            streakCount = 1;
-          } else {
-            const lastDate = new Date(lastWorkoutDateStr);
-            const currentDate = new Date(today);
-            const diffTime = currentDate - lastDate;
-            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays === 1) {
-              streakCount++;
-            } else if (diffDays > 1) {
-              streakCount = 1;
-            }
-          }
-          lastWorkoutDateStr = today;
-          localStorage.setItem('workoutStreak', streakCount.toString());
-          localStorage.setItem('lastWorkoutDateStr', today);
+      if (completed) {
+        playBeep(900, 0.15, 'triangle');
+        feedback.className = 'feedback-msg msg-success';
+        feedback.textContent = '🎉 Great job! Exercise completed successfully.';
+        
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
         }
-        updateStreakDisplay();
-        updateDailyGoalUI();
-        saveProgressToSupabase();
+
+        recordWorkoutResult(activeName, activeReps, 'completed');
+        updateStreakOnComplete();
+        totalLifetimeWorkouts++;
+        localStorage.setItem('totalLifetimeWorkouts', totalLifetimeWorkouts);
       } else {
         playBeep(300, 0.15, 'sawtooth');
-        feedback.className = "feedback-msg msg-fail";
-        feedback.innerText = "⚠️ Marked as skipped. Keep pushing next time!";
+        feedback.className = 'feedback-msg msg-fail';
+        feedback.textContent = '❌ Skipped. Push harder next time!';
+        recordWorkoutResult(activeName, activeReps, 'skipped');
       }
 
       setTimeout(() => {
         document.getElementById('resultBox').style.display = 'none';
         document.getElementById('spinDisplay').style.display = 'flex';
-        currentExerciseIndex = null;
+        document.getElementById('displayText').textContent = 'Pick a level & press Spin';
       }, 2000);
     }
 
-    function updateStreakDisplay() {
-      const streakBox = document.getElementById('streakDisplay');
-      if (!streakBox.classList.contains('streak-warning')) {
-        streakBox.innerText = `🔥 Daily Streak: ${streakCount} Days`;
+    function recordWorkoutResult(name, reps, status) {
+      const record = { name, reps, status, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+      workoutHistory.unshift(record);
+      localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
+      localStorage.setItem('workoutHistoryDate', todayStr);
+      renderHistory();
+      updateDailyGoalUI();
+      saveProgressToSupabase();
+    }
+
+    function renderHistory() {
+      const listEl = document.getElementById('historyList');
+      if (workoutHistory.length === 0) {
+        listEl.innerHTML = '<div class="empty-history">No exercises logged today yet!</div>';
+        return;
+      }
+      let html = '';
+      workoutHistory.forEach(item => {
+        const badgeClass = item.status === 'completed' ? 'status-completed' : 'status-skipped';
+        html += `
+          <div class="history-item">
+            <div class="history-details">
+              <span class="history-name">${item.name} (${item.reps})</span>
+              <span class="history-reps">${item.time}</span>
+            </div>
+            <span class="status-badge ${badgeClass}">${item.status.toUpperCase()}</span>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+    }
+
+    function clearHistory() {
+      playBeep(350, 0.05);
+      if (confirm("Clear today's exercise log history?")) {
+        workoutHistory = [];
+        localStorage.setItem('todayWorkoutHistory', JSON.stringify([]));
+        renderHistory();
+        updateDailyGoalUI();
+        saveProgressToSupabase();
       }
     }
 
     function updateDailyGoalUI() {
-      const completedCount = workoutHistory.filter(h => h.status === 'Completed').length;
-      const percent = Math.min(100, Math.round((completedCount / dailyTarget) * 100));
-      
-      document.getElementById('goalText').innerText = `🎯 Daily Goal: ${completedCount} / ${dailyTarget} Done`;
-      document.getElementById('goalPercent').innerText = `${percent}%`;
+      const completedCount = workoutHistory.filter(h => h.status === 'completed').length;
+      const percent = Math.min(Math.round((completedCount / dailyTarget) * 100), 100);
+
+      document.getElementById('goalText').textContent = `🎯 Daily Goal: ${completedCount} / ${dailyTarget} Done`;
+      document.getElementById('goalPercent').textContent = `${percent}%`;
       document.getElementById('goalProgressFill').style.width = `${percent}%`;
     }
 
-    function renderHistory() {
-      const list = document.getElementById('historyList');
-      if (workoutHistory.length === 0) {
-        list.innerHTML = `<div class="empty-history">No exercises logged today yet!</div>`;
-        return;
+    function checkStreakExpiry() {
+      if (!lastWorkoutDateStr) return;
+      const lastDate = new Date(lastWorkoutDateStr);
+      const currentDate = new Date(todayStr);
+      const diffTime = Math.abs(currentDate - lastDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1) {
+        streakCount = 0;
+        localStorage.setItem('workoutStreak', '0');
       }
-      list.innerHTML = '';
-      workoutHistory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        div.innerHTML = `
-          <div class="history-details">
-            <span class="history-name">${item.name}</span>
-            <span class="history-reps">${item.reps}</span>
-          </div>
-          <span class="status-badge ${item.status === 'Completed' ? 'status-completed' : 'status-skipped'}">${item.status}</span>
-        `;
-        list.appendChild(div);
-      });
-      updateDailyGoalUI();
     }
 
-    function clearHistory() {
-      playBeep(400, 0.08);
-      workoutHistory = [];
-      localStorage.setItem('todayWorkoutHistory', JSON.stringify([]));
-      renderHistory();
+    function updateStreakOnComplete() {
+      if (lastWorkoutDateStr === todayStr) return;
+
+      if (!lastWorkoutDateStr) {
+        streakCount = 1;
+      } else {
+        const lastDate = new Date(lastWorkoutDateStr);
+        const currentDate = new Date(todayStr);
+        const diffDays = Math.round((currentDate - lastDate) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          streakCount++;
+        } else if (diffDays > 1) {
+          streakCount = 1;
+        }
+      }
+
+      lastWorkoutDateStr = todayStr;
+      localStorage.setItem('workoutStreak', streakCount);
+      localStorage.setItem('lastWorkoutDateStr', lastWorkoutDateStr);
+
+      if (lastActiveDateRecorded !== todayStr) {
+        activeDaysCount++;
+        lastActiveDateRecorded = todayStr;
+        localStorage.setItem('activeDaysCount', activeDaysCount);
+        localStorage.setItem('lastActiveDateRecorded', lastActiveDateRecorded);
+      }
+
+      updateStreakDisplay();
+      updateStatsUI();
+      saveProgressToSupabase();
+    }
+
+    function updateStreakDisplay() {
+      const box = document.getElementById('streakDisplay');
+      box.textContent = `🔥 Daily Streak: ${streakCount} Days`;
+    }
+
+    function updateStatsUI() {
+      document.getElementById('statTotalWorkouts').textContent = totalLifetimeWorkouts;
+      document.getElementById('statActiveDays').textContent = activeDaysCount;
+
+      if (streakCount >= 3) document.getElementById('badge-streak3').classList.add('unlocked');
+      if (streakCount >= 7) document.getElementById('badge-streak7').classList.add('unlocked');
+      if (totalLifetimeWorkouts >= 10) document.getElementById('badge-workout10').classList.add('unlocked');
+      if (totalLifetimeWorkouts >= 50) document.getElementById('badge-workout50').classList.add('unlocked');
     }
   </script>
 </body>
