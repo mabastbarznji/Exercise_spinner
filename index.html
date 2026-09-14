@@ -43,8 +43,8 @@
     .top-bar-settings { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     h1 { font-size: 22px; font-weight: 700; color: var(--text-main); }
     
-    .header-icons { display: flex; gap: 8px; }
-    .icon-btn { background: var(--border-color); border: none; color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+    .header-icons { display: flex; gap: 6px; }
+    .icon-btn { background: var(--border-color); border: none; color: var(--text-main); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
     .icon-btn:hover { opacity: 0.8; }
 
     .intro-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; text-align: center; }
@@ -78,9 +78,12 @@
     .goal-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
     .goal-progress-track { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
     .goal-progress-fill { height: 100%; background: #16a34a; width: 0%; transition: width 0.4s ease; }
+    .target-goals-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .target-goal-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--card-bg); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); }
+    .target-goal-item.completed { border-color: #16a34a; color: #4ade80; background: rgba(22, 163, 74, 0.08); }
 
-    .modal-panel { display: none; background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
-    .modal-panel h3 { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
+    .modal-panel { display: none; background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 16px; max-height: 280px; overflow-y: auto; }
+    .modal-panel h3 { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     .setting-group { margin-bottom: 12px; }
     .setting-label { font-size: 12px; font-weight: 600; color: var(--text-sub); display: block; margin-bottom: 4px; }
     .setting-select, .setting-input { width: 100%; padding: 8px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; margin-bottom: 8px; }
@@ -101,6 +104,11 @@
     .badge-item.unlocked { opacity: 1; border-color: #16a34a; background: rgba(22, 163, 74, 0.1); color: #4ade80; }
 
     .streak-box { text-align: center; font-size: 14px; font-weight: 700; color: var(--accent-text); background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2); }
+
+    .pr-list, .routine-list { display: flex; flex-direction: column; gap: 6px; }
+    .pr-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .pr-exercise-name { font-weight: 600; color: var(--text-main); }
+    .pr-score { color: var(--accent-text); font-weight: 700; }
 
     .level-label { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
     .mode-selection { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -184,9 +192,9 @@
 
     <div id="authGate" class="auth-gate" style="display: none;">
       <div class="top-bar-settings">
-        <div style="width: 36px;"></div>
+        <div style="width: 34px;"></div>
         <div class="auth-title" style="margin-bottom:0;">Welcome Player</div>
-        <div style="width: 36px;"></div>
+        <div style="width: 34px;"></div>
       </div>
       <div class="auth-sub" style="margin-top: 10px;">Enter your email and password to start workout</div>
       <form id="authForm" onsubmit="handleLogin(event)">
@@ -208,14 +216,17 @@
       <div class="top-bar-settings">
         <h1>Exercise Spinner</h1>
         <div class="header-icons">
-          <button class="icon-btn" onclick="toggleStatsModal()" title="Stats & Badges">📊</button>
-          <button class="icon-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+          <button class="icon-btn" onclick="toggleModal('statsModal')" title="Stats & Badges">📊</button>
+          <button class="icon-btn" onclick="toggleModal('prModal')" title="Personal Records">🏆</button>
+          <button class="icon-btn" onclick="toggleModal('routineModal')" title="Routines">📋</button>
+          <button class="icon-btn" onclick="toggleModal('targetModal')" title="Target Goals">🎯</button>
+          <button class="icon-btn" onclick="toggleModal('settingsModal')" title="Settings">⚙️</button>
         </div>
       </div>
 
       <!-- Stats & Badges Dashboard Modal -->
       <div class="modal-panel" id="statsModal">
-        <h3>📊 Lifetime Stats & Badges</h3>
+        <h3>📊 Lifetime Stats & Badges <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('statsModal')">✕</button></h3>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-num" id="statTotalWorkouts">0</div>
@@ -235,25 +246,47 @@
         </div>
       </div>
 
+      <!-- Target Goals Modal -->
+      <div class="modal-panel" id="targetModal">
+        <h3>🎯 Daily Target Reps / Goals <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('targetModal')">✕</button></h3>
+        <span class="setting-label" style="margin-bottom:8px;">Add specific targets (e.g. 20 Push-Ups)</span>
+        <div id="targetGoalsModalList" class="routine-list"></div>
+        <div style="margin-top: 10px; display: flex; gap: 6px;">
+          <input type="text" id="targetExName" class="setting-input" placeholder="Exercise (e.g. Push-Ups)" style="margin-bottom:0;" />
+          <input type="number" id="targetExGoal" class="setting-input" placeholder="Target Reps (e.g. 20)" style="margin-bottom:0; width: 100px;" />
+          <button class="btn btn-secondary" style="margin-top:0; padding: 8px 12px; font-size: 13px;" onclick="addDailyTargetGoal()">Add</button>
+        </div>
+      </div>
+
+      <!-- Personal Records Modal -->
+      <div class="modal-panel" id="prModal">
+        <h3>🏆 Personal Records (PRs) <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('prModal')">✕</button></h3>
+        <span class="setting-label" style="margin-bottom:8px;">Track your all-time highest milestones</span>
+        <div class="pr-list" id="prListContainer"></div>
+        <div style="margin-top: 10px; display: flex; gap: 6px;">
+          <input type="text" id="prExName" class="setting-input" placeholder="Exercise (e.g. Push-Ups)" style="margin-bottom:0;" />
+          <input type="text" id="prScore" class="setting-input" placeholder="Best (e.g. 30 Reps)" style="margin-bottom:0;" />
+          <button class="btn btn-secondary" style="margin-top:0; padding: 8px 12px; font-size: 13px;" onclick="savePersonalRecord()">Save</button>
+        </div>
+      </div>
+
+      <!-- Routines Modal -->
+      <div class="modal-panel" id="routineModal">
+        <h3>📋 Custom Routines <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('routineModal')">✕</button></h3>
+        <span class="setting-label" style="margin-bottom:8px;">Create custom workout sessions</span>
+        <div class="routine-list" id="routineListContainer">
+          <div class="empty-history">No custom routines created yet!</div>
+        </div>
+        <div style="margin-top: 10px;">
+          <input type="text" id="routineTitle" class="setting-input" placeholder="Routine Name (e.g. Upper Body Day)" />
+          <input type="text" id="routineExercises" class="setting-input" placeholder="Exercises separated by comma" />
+          <button class="btn btn-secondary" style="margin-top:0; padding: 10px; font-size: 13px;" onclick="saveNewRoutine()">Save Routine</button>
+        </div>
+      </div>
+
       <!-- Settings Modal -->
       <div class="modal-panel" id="settingsModal">
-        <h3>⚙️ App Settings</h3>
-        <div class="setting-group">
-          <span class="setting-label">Daily Target (Completed Exercises)</span>
-          <select class="setting-select" id="dailyTargetSelect" onchange="updateDailyTargetSettings()">
-            <option value="3">3 Exercises / Day</option>
-            <option value="5" selected>5 Exercises / Day</option>
-            <option value="8">8 Exercises / Day</option>
-            <option value="10">10 Exercises / Day</option>
-          </select>
-        </div>
-        <div class="setting-group">
-          <span class="setting-label">Restore / Adjust Streak Count</span>
-          <div style="display: flex; gap: 8px;">
-            <input type="number" id="manualStreakInput" class="setting-input" placeholder="Set days (e.g. 5)" style="margin-bottom:0;" />
-            <button class="btn btn-secondary" style="margin-top:0; padding: 8px 12px; font-size: 13px;" onclick="restoreStreakManual()">Apply</button>
-          </div>
-        </div>
+        <h3>⚙️ App Settings <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('settingsModal')">✕</button></h3>
         <div class="setting-group">
           <div class="setting-row">
             <span class="setting-label" style="margin-bottom:0;">Dark / Light Theme</span>
@@ -276,7 +309,7 @@
 
       <!-- Custom Exercise Modal -->
       <div class="modal-panel" id="customModal">
-        <h3>➕ Add Custom Exercise</h3>
+        <h3>➕ Add Custom Exercise <button style="background:none;border:none;color:var(--text-sub);cursor:pointer;" onclick="toggleModal('customModal')">✕</button></h3>
         <input type="text" id="customName" class="setting-input" placeholder="Exercise Name (e.g. Burpees)" />
         <input type="text" id="customBeginner" class="setting-input" placeholder="Beginner Reps (e.g. 5 Reps)" />
         <input type="text" id="customIntermediate" class="setting-input" placeholder="Intermediate Reps (e.g. 12 Reps)" />
@@ -288,11 +321,14 @@
 
       <div class="goal-box">
         <div class="goal-header">
-          <span id="goalText">🎯 Daily Goal: 0 / 5 Done</span>
+          <span id="goalText">🎯 Daily Target Goals</span>
           <span id="goalPercent">0%</span>
         </div>
         <div class="goal-progress-track">
           <div class="goal-progress-fill" id="goalProgressFill"></div>
+        </div>
+        <div class="target-goals-list" id="targetGoalsDisplayList">
+          <div class="empty-history" style="padding: 4px;">Click 🎯 icon above to add daily rep goals!</div>
         </div>
       </div>
 
@@ -346,7 +382,7 @@
         <select class="select-dropdown" id="exerciseSelect" onchange="selectManualExercise()">
           <option value="">-- Choose Manually --</option>
         </select>
-        <button class="btn-add-ex" onclick="toggleCustomModal()" title="Add Custom Exercise">+</button>
+        <button class="btn-add-ex" onclick="toggleModal('customModal')" title="Add Custom Exercise">+</button>
       </div>
 
       <div class="history-section">
@@ -367,7 +403,6 @@
     let timerInterval = null;
     let secondsLeft = 0;
     
-    // Fallback load from local storage
     let streakCount = parseInt(localStorage.getItem('workoutStreak') || '0');
     let lastWorkoutDateStr = localStorage.getItem('lastWorkoutDateStr');
     let currentRestTime = 30;
@@ -375,12 +410,15 @@
     let isCurrentlyEasier = false;
     let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
     let dumbbellModeOnly = localStorage.getItem('dumbbellModeOnly') === 'true';
-    let dailyTarget = parseInt(localStorage.getItem('dailyTarget') || '5');
     let currentUserEmail = localStorage.getItem('currentUserEmail') || '';
     
     let totalLifetimeWorkouts = parseInt(localStorage.getItem('totalLifetimeWorkouts') || '0');
     let activeDaysCount = parseInt(localStorage.getItem('activeDaysCount') || '0');
     let lastActiveDateRecorded = localStorage.getItem('lastActiveDateRecorded') || '';
+
+    let personalRecords = JSON.parse(localStorage.getItem('personalRecords') || '{"Push-Ups": "25 Reps", "Pull-Ups": "12 Reps", "Squats": "30 Reps"}');
+    let customRoutines = JSON.parse(localStorage.getItem('customRoutines') || '[]');
+    let targetGoals = JSON.parse(localStorage.getItem('targetGoals') || '[{"name": "Push-Ups", "target": 20, "current": 0}, {"name": "Squats", "target": 30, "current": 0}]');
 
     function getTodayString() {
       const d = new Date();
@@ -574,7 +612,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('soundToggle').checked = soundEnabled;
-      document.getElementById('dailyTargetSelect').value = dailyTarget;
 
       const currentTheme = document.body.getAttribute('data-theme');
       document.getElementById('themeToggleCheckbox').checked = (currentTheme === 'light');
@@ -584,6 +621,9 @@
       updateStreakDisplay();
       updateDailyGoalUI();
       updateStatsUI();
+      renderPRList();
+      renderRoutineList();
+      renderTargetGoalsUI();
 
       setTimeout(() => {
         document.getElementById('introScreen').style.display = 'none';
@@ -601,8 +641,10 @@
           .upsert({ 
             email: currentUserEmail, 
             streak: streakCount, 
-            daily_goals: dailyTarget.toString(),
-            today_history: JSON.stringify(workoutHistory)
+            today_history: JSON.stringify(workoutHistory),
+            personal_records: JSON.stringify(personalRecords),
+            routines: JSON.stringify(customRoutines),
+            target_goals: JSON.stringify(targetGoals)
           }, { onConflict: 'email' });
       } catch (err) {
         console.error('Error saving to cloud:', err);
@@ -613,20 +655,14 @@
       try {
         const { data } = await supabase
           .from('profiles')
-          .select('streak, daily_goals, today_history')
+          .select('streak, today_history, personal_records, routines, target_goals')
           .eq('email', email)
           .single();
 
         if (data) {
-          // Keep the highest streak value to prevent accidental resets
           if (data.streak !== null && data.streak >= streakCount) {
             streakCount = data.streak;
             localStorage.setItem('workoutStreak', streakCount.toString());
-          }
-          if (data.daily_goals) {
-            dailyTarget = parseInt(data.daily_goals);
-            localStorage.setItem('dailyTarget', dailyTarget.toString());
-            document.getElementById('dailyTargetSelect').value = dailyTarget;
           }
           if (data.today_history) {
             try {
@@ -637,9 +673,30 @@
               }
             } catch(e) {}
           }
+          if (data.personal_records) {
+            try {
+              personalRecords = JSON.parse(data.personal_records);
+              localStorage.setItem('personalRecords', JSON.stringify(personalRecords));
+            } catch(e) {}
+          }
+          if (data.routines) {
+            try {
+              customRoutines = JSON.parse(data.routines);
+              localStorage.setItem('customRoutines', JSON.stringify(customRoutines));
+            } catch(e) {}
+          }
+          if (data.target_goals) {
+            try {
+              targetGoals = JSON.parse(data.target_goals);
+              localStorage.setItem('targetGoals', JSON.stringify(targetGoals));
+            } catch(e) {}
+          }
           updateStreakDisplay();
           updateDailyGoalUI();
           updateStatsUI();
+          renderPRList();
+          renderRoutineList();
+          renderTargetGoalsUI();
           renderHistory();
         }
       } catch (err) {
@@ -698,29 +755,19 @@
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    function toggleSettings() {
+    function toggleModal(modalId) {
       playBeep(480, 0.05);
-      document.getElementById('statsModal').style.display = 'none';
-      document.getElementById('customModal').style.display = 'none';
-      const modal = document.getElementById('settingsModal');
+      ['statsModal', 'prModal', 'routineModal', 'targetModal', 'settingsModal', 'customModal'].forEach(id => {
+        if (id !== modalId) {
+          document.getElementById(id).style.display = 'none';
+        }
+      });
+      const modal = document.getElementById(modalId);
       modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function toggleStatsModal() {
-      playBeep(480, 0.05);
-      document.getElementById('settingsModal').style.display = 'none';
-      document.getElementById('customModal').style.display = 'none';
-      const modal = document.getElementById('statsModal');
-      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-      updateStatsUI();
-    }
-
-    function toggleCustomModal() {
-      playBeep(480, 0.05);
-      document.getElementById('settingsModal').style.display = 'none';
-      document.getElementById('statsModal').style.display = 'none';
-      const modal = document.getElementById('customModal');
-      modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+      if (modalId === 'statsModal') updateStatsUI();
+      if (modalId === 'prModal') renderPRList();
+      if (modalId === 'routineModal') renderRoutineList();
+      if (modalId === 'targetModal') renderTargetGoalsUI();
     }
 
     function toggleThemeSetting() {
@@ -750,28 +797,6 @@
         btn.classList.remove('active');
         btn.textContent = "🏋️ Dumbbell Mode Only: OFF";
       }
-    }
-
-    function updateDailyTargetSettings() {
-      dailyTarget = parseInt(document.getElementById('dailyTargetSelect').value);
-      localStorage.setItem('dailyTarget', dailyTarget);
-      updateDailyGoalUI();
-      saveProgressToSupabase();
-    }
-
-    function restoreStreakManual() {
-      const val = parseInt(document.getElementById('manualStreakInput').value);
-      if (isNaN(val) || val < 0) {
-        alert('Please enter a valid number of days.');
-        return;
-      }
-      streakCount = val;
-      localStorage.setItem('workoutStreak', streakCount.toString());
-      updateStreakDisplay();
-      updateStatsUI();
-      saveProgressToSupabase();
-      alert(`Streak successfully set to ${streakCount} days!`);
-      document.getElementById('manualStreakInput').value = '';
     }
 
     function setMode(mode, btnElement) {
@@ -818,16 +843,162 @@
       customExercises.push(newEx);
       localStorage.setItem('customExercises', JSON.stringify(customExercises));
       rebuildActiveExercises();
-      toggleCustomModal();
-      
-      document.getElementById('customName').value = '';
-      document.getElementById('customBeginner').value = '';
-      document.getElementById('customIntermediate').value = '';
-      document.getElementById('customPro').value = '';
-      document.getElementById('customTut').value = '';
-      document.getElementById('customVideo').value = '';
-      
+      toggleModal('customModal');
       alert('Custom exercise added successfully!');
+    }
+
+    function addDailyTargetGoal() {
+      const name = document.getElementById('targetExName').value.trim();
+      const goal = parseInt(document.getElementById('targetExGoal').value);
+      if (!name || isNaN(goal) || goal <= 0) {
+        alert('Please enter a valid exercise name and target rep count.');
+        return;
+      }
+      targetGoals.push({ name, target: goal, current: 0 });
+      localStorage.setItem('targetGoals', JSON.stringify(targetGoals));
+      document.getElementById('targetExName').value = '';
+      document.getElementById('targetExGoal').value = '';
+      renderTargetGoalsUI();
+      saveProgressToSupabase();
+    }
+
+    function renderTargetGoalsUI() {
+      const modalList = document.getElementById('targetGoalsModalList');
+      const displayList = document.getElementById('targetGoalsDisplayList');
+
+      if (targetGoals.length === 0) {
+        if (modalList) modalList.innerHTML = '<div class="empty-history">No target goals set yet.</div>';
+        if (displayList) displayList.innerHTML = '<div class="empty-history" style="padding: 4px;">Click 🎯 icon above to add daily rep goals!</div>';
+        document.getElementById('goalPercent').textContent = '0%';
+        document.getElementById('goalProgressFill').style.width = '0%';
+        return;
+      }
+
+      let totalTargetSum = 0;
+      let totalCurrentSum = 0;
+
+      let modalHtml = '';
+      let displayHtml = '';
+
+      targetGoals.forEach((item, idx) => {
+        totalTargetSum += item.target;
+        totalCurrentSum += Math.min(item.current, item.target);
+        const isDone = item.current >= item.target;
+
+        modalHtml += `
+          <div class="pr-item">
+            <div>
+              <span class="pr-exercise-name">${item.name}</span>
+              <span style="font-size:11px; color:var(--text-sub); display:block;">Progress: ${item.current} / ${item.target}</span>
+            </div>
+            <button class="btn-clear-history" onclick="removeTargetGoal(${idx})">Delete</button>
+          </div>
+        `;
+
+        displayHtml += `
+          <div class="target-goal-item ${isDone ? 'completed' : ''}">
+            <span>${isDone ? '✅' : '🎯'} <b>${item.name}</b></span>
+            <span><b>${item.current}</b> / ${item.target} reps</span>
+          </div>
+        `;
+      });
+
+      if (modalList) modalList.innerHTML = modalHtml;
+      if (displayList) displayList.innerHTML = displayHtml;
+
+      const overallPercent = totalTargetSum > 0 ? Math.min(Math.round((totalCurrentSum / totalTargetSum) * 100), 100) : 0;
+      document.getElementById('goalPercent').textContent = `${overallPercent}%`;
+      document.getElementById('goalProgressFill').style.width = `${overallPercent}%`;
+    }
+
+    function removeTargetGoal(idx) {
+      playBeep(350, 0.05);
+      targetGoals.splice(idx, 1);
+      localStorage.setItem('targetGoals', JSON.stringify(targetGoals));
+      renderTargetGoalsUI();
+      saveProgressToSupabase();
+    }
+
+    function checkAndCreditTargetGoals(exName, repText) {
+      const matchNum = parseInt(repText);
+      if (isNaN(matchNum)) return;
+
+      let updated = false;
+      targetGoals.forEach(tg => {
+        if (exName.toLowerCase().includes(tg.name.toLowerCase()) || tg.name.toLowerCase().includes(exName.toLowerCase())) {
+          tg.current += matchNum;
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        localStorage.setItem('targetGoals', JSON.stringify(targetGoals));
+        renderTargetGoalsUI();
+      }
+    }
+
+    function savePersonalRecord() {
+      const name = document.getElementById('prExName').value.trim();
+      const score = document.getElementById('prScore').value.trim();
+      if (!name || !score) {
+        alert('Please enter both exercise name and personal record.');
+        return;
+      }
+      personalRecords[name] = score;
+      localStorage.setItem('personalRecords', JSON.stringify(personalRecords));
+      document.getElementById('prExName').value = '';
+      document.getElementById('prScore').value = '';
+      renderPRList();
+      saveProgressToSupabase();
+    }
+
+    function renderPRList() {
+      const container = document.getElementById('prListContainer');
+      let html = '';
+      for (const [ex, score] of Object.entries(personalRecords)) {
+        html += `
+          <div class="pr-item">
+            <span class="pr-exercise-name">${ex}</span>
+            <span class="pr-score">🏆 ${score}</span>
+          </div>
+        `;
+      }
+      container.innerHTML = html || '<div class="empty-history">No personal records logged yet.</div>';
+    }
+
+    function saveNewRoutine() {
+      const title = document.getElementById('routineTitle').value.trim();
+      const exs = document.getElementById('routineExercises').value.trim();
+      if (!title || !exs) {
+        alert('Please provide a routine title and exercises.');
+        return;
+      }
+      customRoutines.push({ title, exs });
+      localStorage.setItem('customRoutines', JSON.stringify(customRoutines));
+      document.getElementById('routineTitle').value = '';
+      document.getElementById('routineExercises').value = '';
+      renderRoutineList();
+      saveProgressToSupabase();
+    }
+
+    function renderRoutineList() {
+      const container = document.getElementById('routineListContainer');
+      if (customRoutines.length === 0) {
+        container.innerHTML = '<div class="empty-history">No custom routines created yet!</div>';
+        return;
+      }
+      let html = '';
+      customRoutines.forEach((r, idx) => {
+        html += `
+          <div class="pr-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+            <div style="display:flex; justify-content:space-width; width:100%;">
+              <span class="pr-exercise-name" style="font-size:13px; color:var(--accent-text);">📌 ${r.title}</span>
+            </div>
+            <span style="font-size:11px; color:var(--text-sub);">Exercises: ${r.exs}</span>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
     function spinExercise() {
@@ -983,6 +1154,7 @@
         }
 
         recordWorkoutResult(activeName, activeReps, 'completed');
+        checkAndCreditTargetGoals(activeName, activeReps);
         updateStreakOnComplete();
         totalLifetimeWorkouts++;
         localStorage.setItem('totalLifetimeWorkouts', totalLifetimeWorkouts);
@@ -1006,7 +1178,6 @@
       localStorage.setItem('todayWorkoutHistory', JSON.stringify(workoutHistory));
       localStorage.setItem('workoutHistoryDate', todayStr);
       renderHistory();
-      updateDailyGoalUI();
       saveProgressToSupabase();
     }
 
@@ -1038,18 +1209,12 @@
         workoutHistory = [];
         localStorage.setItem('todayWorkoutHistory', JSON.stringify([]));
         renderHistory();
-        updateDailyGoalUI();
         saveProgressToSupabase();
       }
     }
 
     function updateDailyGoalUI() {
-      const completedCount = workoutHistory.filter(h => h.status === 'completed').length;
-      const percent = Math.min(Math.round((completedCount / dailyTarget) * 100), 100);
-
-      document.getElementById('goalText').textContent = `🎯 Daily Goal: ${completedCount} / ${dailyTarget} Done`;
-      document.getElementById('goalPercent').textContent = `${percent}%`;
-      document.getElementById('goalProgressFill').style.width = `${percent}%`;
+      renderTargetGoalsUI();
     }
 
     function updateStreakOnComplete() {
